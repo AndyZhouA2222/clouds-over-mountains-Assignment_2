@@ -7,3 +7,5 @@ data/cache/
 __pycache__/
 .DS_Store
 Thumbs.db
+.agents/
+skills-lock.json

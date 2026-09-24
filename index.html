@@ -7,59 +7,69 @@
   <meta name="description" content="楚格峰地区的七天 NASA VIIRS 云图与 DWD 山谷、山顶逐小时温差探索。">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='8' fill='%231b302e'/%3E%3Cpath d='M6 30 20 8l14 22M12 20l8 5 8-5' fill='none' stroke='%23f4bb63' stroke-width='2.5'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="field-study.css">
+  <link rel="stylesheet" href="field-theory.css">
   <script defer src="data/observations.js"></script>
   <script defer src="data/clouds.js"></script>
   <script defer src="app.js"></script>
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="./"><span class="brand-mark" aria-hidden="true">∧</span><span>ZUGSPITZE <small>FIELD STUDY / 2026</small></span></a>
+    <a class="brand" href="./"><span class="brand-mark" aria-hidden="true">∧</span><span>ZUGSPITZE <small>ATMOSPHERIC FIELD / 2026</small></span></a>
     <div class="top-meta"><span>47.421° N</span><span>10.985° E</span><span class="top-meta-divider"></span><span>DWD × NASA GIBS</span></div>
     <button class="source-button" id="about-button">数据来源 <span aria-hidden="true">↗</span></button>
   </header>
 
-  <main>
-    <section class="intro">
-      <div><p class="kicker">CLOUD FIELD / SEVEN-DAY COMPARISON</p><h1>山谷升温时，云顶发生了什么？</h1><p class="intro-copy">先比较七天真实温差，再回到每天的卫星影像，寻找值得继续研究的时段。</p></div>
-      <div class="real-badge"><span class="status-dot"></span><strong>真实观测</strong><small>14–20 SEP 2026 · UTC</small></div>
-    </section>
-
-    <section class="day-nav" aria-label="观测日期"><div class="nav-label"><span>观测日期</span><small>选择一天开始阅读</small></div><div id="day-strip" class="day-strip"></div></section>
-
-    <section class="explorer-grid">
-      <section class="map-card" aria-labelledby="map-heading">
-        <div class="card-head"><div><p class="kicker">01 / SATELLITE VIEW</p><h2 id="map-heading">这一天天空的形状</h2></div><div class="layer-switch" role="group" aria-label="地图图层"><button data-layer="natural" aria-pressed="true">真彩色</button><button data-layer="height" aria-pressed="false">云顶高度</button><button data-layer="terrain" aria-pressed="false">地形</button></div></div>
-        <div class="map-frame" id="map-frame" aria-label="楚格峰区域卫星地图">
-          <div class="map-world" id="map-world"><img id="map-image" src="data/raw/viirs-20260920.jpg" alt="楚格峰区域真实 NASA VIIRS 真彩色卫星影像" draggable="false"><canvas id="cloud-canvas" width="1440" height="900" aria-hidden="true" hidden></canvas><div id="map-markers"></div></div>
-          <div class="map-overlay-top"><span id="map-date">22 / 09 / 2026</span><span id="map-time">DAILY COMPOSITE</span></div>
-          <div class="map-overlay-bottom"><span id="map-caption">NASA VIIRS · 真彩色日合成</span><span id="map-credit">NASA GIBS</span></div>
-          <div id="height-legend" class="height-legend" hidden><span>云顶高度 / m</span><i></i><div><b>0.5</b><b>2</b><b>5</b><b>10 km</b></div></div>
-          <div class="map-controls"><span class="north">N<svg viewBox="0 0 18 22" aria-hidden="true"><path d="m9 1 7 20-7-5-7 5Z"/></svg></span><button id="zoom-in" aria-label="放大地图">+</button><button id="zoom-out" aria-label="缩小地图">−</button><button id="reset-map" aria-label="恢复地图范围">⌖</button></div>
-          <p id="map-error" class="map-error" hidden>影像未能载入，请确认完整保留原型文件夹。</p>
-        </div>
-        <div class="map-note"><span id="map-note">每日影像只说明这一天的云形态，不代表当前整点。</span><span id="map-bounds">同投影 · 保持比例</span></div>
+  <main class="field-main">
+    <section class="field-stage" aria-labelledby="map-heading">
+      <div class="stage-heading">
+        <div class="stage-title"><p class="kicker">CLOUD FIELD / ZUGSPITZE</p><h1 id="map-heading">山谷升温时，云顶发生了什么？</h1><p>卫星影像与山地温差的七日观测</p></div>
+        <div class="stage-readout"><span class="readout-label">当前温差 ΔT</span><div><strong id="live-delta">—</strong><em>°C</em></div><small><span id="reading-time">12:00 UTC</span> · 山谷 − 山顶</small><small>本日峰值 <b id="delta-peak">—</b>°C · <span id="peak-time">UTC</span></small></div>
+      </div>
+      <div class="map-frame" id="map-frame" aria-label="楚格峰区域卫星影像和云顶高度并列观测">
+        <section class="map-panel viirs-panel" id="viirs-panel" aria-label="NASA VIIRS 真彩色影像">
+          <div class="map-world" id="map-world"><img id="map-image" src="data/raw/viirs-20260920.jpg" alt="楚格峰区域真实 NASA VIIRS 真彩色卫星影像" draggable="false"><div id="map-markers"></div></div>
+          <div class="scene-shade" aria-hidden="true"></div>
+          <div class="panel-label"><span>OPTICAL / NASA VIIRS</span><strong id="map-date">09 / 20 / 2026</strong><small id="map-time">DAILY COMPOSITE</small></div>
+          <div class="scene-title-lockup"><span id="scene-index">FIELD 07 / 07</span><strong id="scene-date">20<span>SEP</span></strong><small>TRUE COLOR</small></div>
+          <div class="scene-data-rail"><span class="rail-label">DWD STATIONS</span><div><i class="rail-valley"></i><span>VALLEY <b id="valley-now">—</b>°C</span></div><div><i class="rail-summit"></i><span>SUMMIT <b id="summit-now">—</b>°C</span></div><small>719 m <b>↗</b> 2,956 m</small></div>
+          <div id="map-error" class="map-error" hidden>VIIRS 影像未能载入。</div>
+          <div class="stage-dates"><span>VIIRS DAILY / UTC</span><div id="day-strip" class="day-strip" aria-label="选择卫星影像日期"></div></div>
+        </section>
+        <section class="map-panel cth-panel" id="cth-panel" aria-label="DWD 云顶高度参考图">
+          <div class="map-world" id="cth-world"><img id="cth-image" class="terrain-image" src="assets/terrain-mercator.jpg" alt="楚格峰区域 Esri 地形参考底图，日期未知" draggable="false"><canvas id="cloud-canvas" width="1440" height="900" aria-hidden="true"></canvas><div id="cth-markers"></div></div>
+          <div class="scene-shade" aria-hidden="true"></div>
+          <div class="panel-label"><span>DWD FCI / CLOUD TOP HEIGHT</span><strong>22 / 09 / 2026</strong><small id="cth-map-time">06:08 UTC</small></div>
+          <div class="height-legend"><span>云顶高度 / km</span><div class="height-swatches"><i></i><i></i><i></i><i></i><i></i></div><div class="legend-values"><b>0.5</b><b>1.5</b><b>2.5</b><b>3.5</b><b>4.5+</b></div><small>透明 = 无有效云高值，不代表晴空</small></div>
+          <div class="cth-frame-readout"><span>区域中位数</span><strong id="cth-map-median">—</strong><small id="cth-map-valid">有效格点 — / 4356</small></div>
+          <div id="cth-map-error" class="map-error" hidden>CTH 参考底图未能载入。</div>
+          <div class="map-controls"><span class="north">N<svg viewBox="0 0 18 22" aria-hidden="true"><path d="m9 1 7 20-7-5-7 5Z"/></svg></span><button id="zoom-in" aria-label="同步放大两幅地图">+</button><button id="zoom-out" aria-label="同步缩小两幅地图">−</button><button id="reset-map" aria-label="恢复两幅地图范围">⌖</button></div>
+          <div class="cth-frame-control"><label class="sr-only" for="cth-slider">选择云顶高度观测帧</label><output id="cth-slider-time">06:08 UTC</output><input id="cth-slider" type="range" min="0" max="12" value="0"><span>13 FRAMES</span></div>
+        </section>
+      </div>
+      <div class="stage-controlbar">
+        <div class="hour-readout"><button id="play-button" aria-label="播放时间序列"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 9 6-9 6Z"/></svg></button><output id="selected-time">12:00 <small>UTC</small></output></div>
+        <div class="slider"><label class="sr-only" for="time-slider">选择小时</label><input id="time-slider" type="range" min="0" max="23" value="12"><div><span>00</span><span>06</span><span>12</span><span>18</span><span>23</span></div></div>
+        <div class="stage-time-meta"><span>DWD TEMPERATURE · UTC</span><strong id="selected-date">20 SEP</strong><small id="day-summary">24 个整点配对观测</small></div>
+      </div>
+      <div class="map-note"><span id="map-note">并列显示不同日期的 VIIRS 日合成与 DWD CTH 参考，不作同期叠加。</span><span id="map-bounds">EPSG:3857 · same extent</span></div>
+      <section class="cth-profile" aria-labelledby="cth-heading">
+        <div class="cth-heading"><span class="cth-tag">REFERENCE SCAN / 22 SEP</span><h2 id="cth-heading">云顶高度分布随时间变化</h2><p>纵轴 km，横轴 UTC；颜色表示高度区间，亮度表示有效格点中的相对占比，白线为区域中位数。</p></div>
+        <div class="cth-stat"><span>选定帧区域中位数</span><strong id="cth-median">—</strong><small id="cth-frame-label">--:08 UTC</small></div>
+        <svg id="cth-chart" role="img" aria-label="2026 年 9 月 22 日 13 帧各云顶高度区间格点比例热图，纵轴为公里，横轴为 UTC，白线为中位数"></svg>
+        <span class="cth-range-note" id="cth-range-note">有效格点比例与 P10–P90：—</span>
       </section>
-
-      <aside class="day-card" aria-labelledby="day-heading">
-        <div class="card-head"><div><p class="kicker">02 / FIELD NOTES</p><h2 id="day-heading">读这一日</h2></div><span id="selected-date" class="date-stamp">22 SEP</span></div>
-        <p id="day-summary" class="day-summary">真实两站温差的日内变化。</p>
-        <div class="big-stat"><span>温差峰值 ΔT</span><div><strong id="delta-peak">18.3</strong><em>°C</em></div><small>山谷 − 山顶 · 当日 15:00 UTC</small></div>
-        <div class="stat-pair"><div><span class="stat-label"><i class="dot valley"></i>山谷</span><strong id="valley-now">16.3</strong><em>°C</em><small>Garmisch · 719 m</small></div><div><span class="stat-label"><i class="dot summit"></i>山顶</span><strong id="summit-now">−1.4</strong><em>°C</em><small>Zugspitze · 2,956 m</small></div></div>
-        <div class="reading-line"><span>当前整点 <b id="reading-time">12:00 UTC</b></span><span>日内范围 <b id="delta-range">5.3—18.3 °C</b></span></div>
-        <div class="data-status"><span class="status-dot"></span><span>DWD 小时观测 · QN_9 = 1<br><small>形式检查，未替代完整质量控制</small></span></div>
-      </aside>
     </section>
 
     <section class="analysis-card" aria-labelledby="analysis-heading">
-      <div class="analysis-head"><div><p class="kicker">03 / TIME SERIES</p><h2 id="analysis-heading">七天放在一起，差异才出现</h2><p>上：每日温差峰值。下：当前日期的 24 小时温差。</p></div><div class="chart-legend"><span><i class="legend-line daily-line"></i>14–20 SEP 峰值</span><span><i class="legend-line selected-line"></i>选定日小时线</span></div></div>
-      <div class="chart-shell"><span class="axis-label axis-top">每日峰值 / °C</span><span class="axis-label axis-bottom">选定日温差 / °C</span><svg id="analysis-chart" role="img" aria-label="七天温差峰值和选定日温差时间序列"></svg></div>
-      <div class="timeline-controls"><button id="play-button" aria-label="播放时间序列"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 9 6-9 6Z"/></svg></button><output id="selected-time">12:00 <small>UTC</small></output><div class="slider"><label class="sr-only" for="time-slider">选择小时</label><input id="time-slider" type="range" min="0" max="23" value="12"><div><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>23:00</span></div></div><span class="frame-count">168 组温差 · 13 帧 CTH 参考</span></div>
+      <div class="analysis-head"><div><p class="kicker">THERMAL TRANSECT / 14—20 SEP</p><h2 id="analysis-heading">七天温差剖面</h2><p>两站海拔相差 2,237 m · 相距约 8 km</p></div><div class="chart-legend"><span><i class="legend-line daily-line"></i>每日峰值 ΔT</span><span><i class="legend-line selected-line"></i>选定日小时线</span></div></div>
+      <div class="chart-shell"><span class="axis-label axis-top">温差 / °C</span><svg id="analysis-chart" role="img" aria-label="七天温差峰值和选定日温差时间序列"></svg></div>
     </section>
 
-    <section class="reading-note"><span class="note-number">READ BEFORE INTERPRETING</span><p>温差是两座相距约 8 km 的气象站之差；云顶高度是卫星反演结果。它们能帮助定位值得研究的时段，但单独不能证明积雨云。</p><a href="data/observations.json" download>下载观测摘要 ↓</a><a href="data/clouds.json" download>下载云高格网 ↓</a></section>
+    <section class="reading-note"><span class="note-number">INTERPRETATION LIMIT</span><p>VIIRS 为 9 月 14–20 日真彩色日合成；DWD CTH 仅有 9 月 22 日 13 帧参考。日期不同，不作同期叠加。温差和云顶高度都不能单独证明积雨云。</p><a href="data/observations.json" download>观测数据 ↓</a><a href="data/clouds.json" download>CTH 格网 ↓</a></section>
     <footer><span>ZUGSPITZE / CLOUD FIELD STUDY</span><span>DWD · NASA GIBS · Esri <i>·</i> 本地静态原型</span></footer>
   </main>
 
-  <dialog id="data-dialog"><div class="dialog-head"><div><p class="kicker">PROVENANCE</p><h2>数据从哪里来</h2></div><button id="close-dialog" aria-label="关闭数据来源">×</button></div><div class="dialog-body"><section><b>01</b><div><h3>DWD 小时气温</h3><p>01550 Garmisch-Partenkirchen（719 m）与 05792 Zugspitze（2,956 m），2026-09-20 至 22，共 144 条小时记录，72 组配对。原始时间为 UTC，单位 °C，缺测不插补。</p><a href="https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/" target="_blank" rel="noreferrer">打开 DWD 目录 ↗</a></div></section><section><b>02</b><div><h3>DWD 云顶高度</h3><p>2026-09-22 的 13 帧 CTH NetCDF 产品，CF 时间为 06:08–18:08 UTC，44×99 格网，单位 m。显示有效正云高和 opacity 格点；透明不等于晴空。</p><a href="https://opendata.dwd.de/weather/satellite/clouds/CTH/" target="_blank" rel="noreferrer">打开 DWD CTH 目录 ↗</a></div></section><section><b>03</b><div><h3>NASA VIIRS 与地形</h3><p>20–22 日 Suomi NPP / VIIRS 真彩色日合成影像。地形参考为 Esri World Imagery 拼接底图，日期未知。两种底图都保持 1440×900 EPSG:3857 比例。</p><p class="attribution">Source: NASA GIBS · Source: Esri, Vantor, Earthstar Geographics, and the GIS User Community</p></div></section><section><b>04</b><div><h3>研究边界</h3><p>本页面没有积雨云分类、DEM 遮挡、太阳方位、相机俯仰角或安全建议。云图和温差用于探索，不构成天气预报或最佳拍摄保证。</p></div></section></div></dialog>
+<dialog id="data-dialog"><div class="dialog-head"><div><p class="kicker">PROVENANCE</p><h2>数据从哪里来</h2></div><button id="close-dialog" aria-label="关闭数据来源">×</button></div><div class="dialog-body"><section><b>01</b><div><h3>DWD 小时气温</h3><p>01550 Garmisch-Partenkirchen（719 m）与 05792 Zugspitze（2,956 m），2026-09-14 至 20，共 336 条小时记录，168 组配对。原始时间为 UTC，单位 °C，缺测不插补。</p><a href="https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/" target="_blank" rel="noreferrer">打开 DWD 目录 ↗</a></div></section><section><b>02</b><div><h3>DWD 云顶高度</h3><p>2026-09-22 的 13 帧 CTH NetCDF 产品，CF 时间为 06:08–18:08 UTC，44×99 格网，单位 m。显示有效正云高和 opacity 格点；透明不等于晴空。</p><a href="https://opendata.dwd.de/weather/satellite/clouds/CTH/" target="_blank" rel="noreferrer">打开 DWD CTH 目录 ↗</a></div></section><section><b>03</b><div><h3>NASA VIIRS 与地形</h3><p>14–20 日 Suomi NPP / VIIRS 真彩色日合成影像。地形参考为 Esri World Imagery 拼接底图，日期未知。两种底图都保持 1440×900 EPSG:3857 比例。</p><p class="attribution">Source: NASA GIBS · Source: Esri, Vantor, Earthstar Geographics, and the GIS User Community</p></div></section><section><b>04</b><div><h3>研究边界</h3><p>本页面没有积雨云分类、DEM 遮挡、太阳方位、相机俯仰角或安全建议。云图和温差用于探索，不构成天气预报或最佳拍摄保证。</p></div></section></div></dialog>
 </body>
 </html>
