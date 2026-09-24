@@ -1,0 +1,174 @@
+{
+  "projection": "EPSG:3857",
+  "bbox": [
+    1063401.2038180765,
+    5910900.252768108,
+    1383401.2038180765,
+    6110900.252768108
+  ],
+  "width": 1440,
+  "height": 900,
+  "sources": [
+    {
+      "title": "DWD hourly air temperature",
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/stundenwerte_TU_01550_akt.zip",
+      "file": "data/raw/stundenwerte_TU_01550_akt.zip",
+      "bytes": 79849,
+      "sha256": "616ea0555a1fec1d228707b9db64580b1974f834af3310a5f592cb5af9b37e4a"
+    },
+    {
+      "title": "DWD hourly air temperature",
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/stundenwerte_TU_05792_akt.zip",
+      "file": "data/raw/stundenwerte_TU_05792_akt.zip",
+      "bytes": 78299,
+      "sha256": "5a1324f35d6ecea631d1c4074995fafe0b8145a4b2108d1ac76a369b3b64d159"
+    },
+    {
+      "title": "DWD cloud-top-height reference",
+      "url": "https://opendata.dwd.de/weather/satellite/clouds/CTH/CTHin202609220600nEU.nc.bz2",
+      "file": "data/raw/CTHin202609220600nEU.nc.bz2",
+      "bytes": 755934,
+      "sha256": "9af9933e760f205a937f33d1c442d18fa00f41051988c564ca51f0303f14a33d"
+    },
+    {
+      "title": "DWD cloud-top-height reference",
+      "url": "https://opendata.dwd.de/weather/satellite/clouds/CTH/CTHin202609220700nEU.nc.bz2",
+      "file": "data/raw/CTHin202609220700nEU.nc.bz2",
+      "bytes": 752758,
+      "sha256": "efae8795f59f7633d4e9339c3ec076e23da3bc0a52769e1b187c0273d95c3749"
+    },
+    {
+      "title": "DWD cloud-top-height reference",
+      "url": "https://opendata.dwd.de/weather/satellite/clouds/CTH/CTHin202609220800nEU.nc.bz2",
+      "file": "data/raw/CTHin202609220800nEU.nc.bz2",
+      "bytes": 769089,
+      "sha256": "80b8f8f96f79f8914cc544d183c575c10340d0aa9765edb41747eccc7c3dddac"
+    },
+    {
+      "title": "DWD cloud-top-height reference",
+      "url": "https://opendata.dwd.de/weather/satellite/clouds/CTH/CTHin202609220900nEU.nc.bz2",
+      "file": "data/raw/CTHin202609220900nEU.nc.bz2",
+      "bytes": 785188,
+      "sha256": "50758cfcae744793a473b809df76abf9b1ddfc6bdc656ca52214995cc1a2c477"
+    },
+    {
+      "title": "DWD cloud-top-height reference",
+      "url": "https://opendata.dwd.de/weather/satellite/clouds/CTH/CTHin202609221000nEU.nc.bz2",
+      "file": "data/raw/CTHin202609221000nEU.nc.bz2",
+      "bytes": 937461,
+      "sha256": "4666add68418ee5c364c84a698884553669e435bddb899cefddcbdedbd487485"
+    },
+    {
+      "title": "DWD cloud-top-height reference",
+      "url": "https://opendata.dwd.de/weather/satellite/clouds/CTH/CTHin202609221100nEU.nc.bz2",
+      "file": "data/raw/CTHin202609221100nEU.nc.bz2",
+      "bytes": 784717,
+      "sha256": "078091777d44e32a5c63c3623e5e6c51f438240b9f3bc3157bbdee0b0147a793"
+    },
+    {
+      "title": "DWD cloud-top-height reference",
+      "url": "https://opendata.dwd.de/weather/satellite/clouds/CTH/CTHin202609221200nEU.nc.bz2",
+      "file": "data/raw/CTHin202609221200nEU.nc.bz2",
+      "bytes": 788599,
+      "sha256": "fbbca3bbd1f95bc85501094a578d36472772829a79fa7dd130c77861f82223d8"
+    },
+    {
+      "title": "DWD cloud-top-height reference",
+      "url": "https://opendata.dwd.de/weather/satellite/clouds/CTH/CTHin202609221300nEU.nc.bz2",
+      "file": "data/raw/CTHin202609221300nEU.nc.bz2",
+      "bytes": 806021,
+      "sha256": "39c0fad5c9b841fc977f1e6697e6d558fc90a53502cbdebf7690b84d343934ba"
+    },
+    {
+      "title": "DWD cloud-top-height reference",
+      "url": "https://opendata.dwd.de/weather/satellite/clouds/CTH/CTHin202609221400nEU.nc.bz2",
+      "file": "data/raw/CTHin202609221400nEU.nc.bz2",
+      "bytes": 810694,
+      "sha256": "8df6e67a3a4951478f81a5e3f8b78ec44f605b49bc1899e2245f0ec431080dc0"
+    },
+    {
+      "title": "DWD cloud-top-height reference",
+      "url": "https://opendata.dwd.de/weather/satellite/clouds/CTH/CTHin202609221500nEU.nc.bz2",
+      "file": "data/raw/CTHin202609221500nEU.nc.bz2",
+      "bytes": 812923,
+      "sha256": "e457fe4c6378d1afe5671b066a5c42b3fb923fbb54bdfe203dc2678426e08541"
+    },
+    {
+      "title": "DWD cloud-top-height reference",
+      "url": "https://opendata.dwd.de/weather/satellite/clouds/CTH/CTHin202609221600nEU.nc.bz2",
+      "file": "data/raw/CTHin202609221600nEU.nc.bz2",
+      "bytes": 811236,
+      "sha256": "0016b6559e998ace93b5b7d0ad74691c9dd8aa4c412e896317f911c776a42360"
+    },
+    {
+      "title": "DWD cloud-top-height reference",
+      "url": "https://opendata.dwd.de/weather/satellite/clouds/CTH/CTHin202609221700nEU.nc.bz2",
+      "file": "data/raw/CTHin202609221700nEU.nc.bz2",
+      "bytes": 811501,
+      "sha256": "0c0ba02c7aad191fc55fbd0e222a514e7ad4e940246cea957c6edf72e09cca9b"
+    },
+    {
+      "title": "DWD cloud-top-height reference",
+      "url": "https://opendata.dwd.de/weather/satellite/clouds/CTH/CTHin202609221800nEU.nc.bz2",
+      "file": "data/raw/CTHin202609221800nEU.nc.bz2",
+      "bytes": 804354,
+      "sha256": "09aabda983520b24f184e6c89cbea09bae98cf3adead4d88eba4bff08c1c8a5d"
+    },
+    {
+      "title": "NASA GIBS / Suomi NPP VIIRS true-colour daily composite",
+      "url": "https://gibs.earthdata.nasa.gov/wms/epsg3857/best/wms.cgi?SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&LAYERS=VIIRS_SNPP_CorrectedReflectance_TrueColor&STYLES=&SRS=EPSG%3A3857&BBOX=1063401.2038180765%2C5910900.252768108%2C1383401.2038180765%2C6110900.252768108&WIDTH=1440&HEIGHT=900&FORMAT=image%2Fjpeg&TIME=2026-09-14",
+      "file": "data/raw/viirs-20260914.jpg",
+      "bytes": 260511,
+      "sha256": "43990f3e3b78e7c6ae6c5b2212c10c7872fe1e0d2adbf021cef24b7dc68070b5"
+    },
+    {
+      "title": "NASA GIBS / Suomi NPP VIIRS true-colour daily composite",
+      "url": "https://gibs.earthdata.nasa.gov/wms/epsg3857/best/wms.cgi?SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&LAYERS=VIIRS_SNPP_CorrectedReflectance_TrueColor&STYLES=&SRS=EPSG%3A3857&BBOX=1063401.2038180765%2C5910900.252768108%2C1383401.2038180765%2C6110900.252768108&WIDTH=1440&HEIGHT=900&FORMAT=image%2Fjpeg&TIME=2026-09-15",
+      "file": "data/raw/viirs-20260915.jpg",
+      "bytes": 154146,
+      "sha256": "418ed466960befdf6c8b5fc966d65e7fb2552c62eaad79663290dd9dc89d58b0"
+    },
+    {
+      "title": "NASA GIBS / Suomi NPP VIIRS true-colour daily composite",
+      "url": "https://gibs.earthdata.nasa.gov/wms/epsg3857/best/wms.cgi?SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&LAYERS=VIIRS_SNPP_CorrectedReflectance_TrueColor&STYLES=&SRS=EPSG%3A3857&BBOX=1063401.2038180765%2C5910900.252768108%2C1383401.2038180765%2C6110900.252768108&WIDTH=1440&HEIGHT=900&FORMAT=image%2Fjpeg&TIME=2026-09-16",
+      "file": "data/raw/viirs-20260916.jpg",
+      "bytes": 162459,
+      "sha256": "02dee91f6a8193864ce11232270f9b8dbf01a1d69f319ab1bb8400c1958a68f7"
+    },
+    {
+      "title": "NASA GIBS / Suomi NPP VIIRS true-colour daily composite",
+      "url": "https://gibs.earthdata.nasa.gov/wms/epsg3857/best/wms.cgi?SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&LAYERS=VIIRS_SNPP_CorrectedReflectance_TrueColor&STYLES=&SRS=EPSG%3A3857&BBOX=1063401.2038180765%2C5910900.252768108%2C1383401.2038180765%2C6110900.252768108&WIDTH=1440&HEIGHT=900&FORMAT=image%2Fjpeg&TIME=2026-09-17",
+      "file": "data/raw/viirs-20260917.jpg",
+      "bytes": 177703,
+      "sha256": "d9d6b19b7c02205913436a2a545cf1c2b3f5b42b8c2786d4155d761dfca3b452"
+    },
+    {
+      "title": "NASA GIBS / Suomi NPP VIIRS true-colour daily composite",
+      "url": "https://gibs.earthdata.nasa.gov/wms/epsg3857/best/wms.cgi?SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&LAYERS=VIIRS_SNPP_CorrectedReflectance_TrueColor&STYLES=&SRS=EPSG%3A3857&BBOX=1063401.2038180765%2C5910900.252768108%2C1383401.2038180765%2C6110900.252768108&WIDTH=1440&HEIGHT=900&FORMAT=image%2Fjpeg&TIME=2026-09-18",
+      "file": "data/raw/viirs-20260918.jpg",
+      "bytes": 119259,
+      "sha256": "4ee6671e5eeaad70090fa1c0111955fb537ad66f62aee93164fed81f4a4320f5"
+    },
+    {
+      "title": "NASA GIBS / Suomi NPP VIIRS true-colour daily composite",
+      "url": "https://gibs.earthdata.nasa.gov/wms/epsg3857/best/wms.cgi?SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&LAYERS=VIIRS_SNPP_CorrectedReflectance_TrueColor&STYLES=&SRS=EPSG%3A3857&BBOX=1063401.2038180765%2C5910900.252768108%2C1383401.2038180765%2C6110900.252768108&WIDTH=1440&HEIGHT=900&FORMAT=image%2Fjpeg&TIME=2026-09-19",
+      "file": "data/raw/viirs-20260919.jpg",
+      "bytes": 178429,
+      "sha256": "34413dce334395d27d608074adef2d0bc2134124341c9b68ea528cbbbb5a4ae8"
+    },
+    {
+      "title": "NASA GIBS / Suomi NPP VIIRS true-colour daily composite",
+      "url": "https://gibs.earthdata.nasa.gov/wms/epsg3857/best/wms.cgi?SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&LAYERS=VIIRS_SNPP_CorrectedReflectance_TrueColor&STYLES=&SRS=EPSG%3A3857&BBOX=1063401.2038180765%2C5910900.252768108%2C1383401.2038180765%2C6110900.252768108&WIDTH=1440&HEIGHT=900&FORMAT=image%2Fjpeg&TIME=2026-09-20",
+      "file": "data/raw/viirs-20260920.jpg",
+      "bytes": 137697,
+      "sha256": "56106d6dd295c11c45f93b2cb8b8291b0346b773b1042805d501d607dffaec2d"
+    },
+    {
+      "title": "Esri World Imagery terrain reference",
+      "url": "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export?bbox=1063401.2038180765%2C5910900.252768108%2C1383401.2038180765%2C6110900.252768108&bboxSR=3857&imageSR=3857&size=1440%2C900&format=jpg&f=image",
+      "file": "assets/terrain-mercator.jpg",
+      "bytes": 526835,
+      "sha256": "788ea5cab54fa5569b144f658f64365a600137e7bb971f58a6f39e09206263df"
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+[
+  {
+    "title": "NASA GIBS / Suomi NPP VIIRS corrected reflectance true color",
+    "date": "2026-09-14",
+    "temporalResolution": "daily composite; per-pixel acquisition time not provided by WMS image",
+    "url": "https://gibs.earthdata.nasa.gov/wms/epsg3857/best/wms.cgi?SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&LAYERS=VIIRS_SNPP_CorrectedReflectance_TrueColor&STYLES=&SRS=EPSG%3A3857&BBOX=1063401.2038180765%2C5910900.252768108%2C1383401.2038180765%2C6110900.252768108&WIDTH=1440&HEIGHT=900&FORMAT=image%2Fjpeg&TIME=2026-09-14",
+    "file": "data/raw/viirs-20260914.jpg",
+    "sha256": "43990f3e3b78e7c6ae6c5b2212c10c7872fe1e0d2adbf021cef24b7dc68070b5",
+    "retrievedUtc": "2026-09-24T03:56:15.364218+00:00",
+    "bytes": 260511
+  },
+  {
+    "title": "NASA GIBS / Suomi NPP VIIRS corrected reflectance true color",
+    "date": "2026-09-15",
+    "temporalResolution": "daily composite; per-pixel acquisition time not provided by WMS image",
+    "url": "https://gibs.earthdata.nasa.gov/wms/epsg3857/best/wms.cgi?SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&LAYERS=VIIRS_SNPP_CorrectedReflectance_TrueColor&STYLES=&SRS=EPSG%3A3857&BBOX=1063401.2038180765%2C5910900.252768108%2C1383401.2038180765%2C6110900.252768108&WIDTH=1440&HEIGHT=900&FORMAT=image%2Fjpeg&TIME=2026-09-15",
+    "file": "data/raw/viirs-20260915.jpg",
+    "sha256": "418ed466960befdf6c8b5fc966d65e7fb2552c62eaad79663290dd9dc89d58b0",
+    "retrievedUtc": "2026-09-24T03:56:15.364218+00:00",
+    "bytes": 154146
+  },
+  {
+    "title": "NASA GIBS / Suomi NPP VIIRS corrected reflectance true color",
+    "date": "2026-09-16",
+    "temporalResolution": "daily composite; per-pixel acquisition time not provided by WMS image",
+    "url": "https://gibs.earthdata.nasa.gov/wms/epsg3857/best/wms.cgi?SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&LAYERS=VIIRS_SNPP_CorrectedReflectance_TrueColor&STYLES=&SRS=EPSG%3A3857&BBOX=1063401.2038180765%2C5910900.252768108%2C1383401.2038180765%2C6110900.252768108&WIDTH=1440&HEIGHT=900&FORMAT=image%2Fjpeg&TIME=2026-09-16",
+    "file": "data/raw/viirs-20260916.jpg",
+    "sha256": "02dee91f6a8193864ce11232270f9b8dbf01a1d69f319ab1bb8400c1958a68f7",
+    "retrievedUtc": "2026-09-24T03:56:15.367196+00:00",
+    "bytes": 162459
+  },
+  {
+    "title": "NASA GIBS / Suomi NPP VIIRS corrected reflectance true color",
+    "date": "2026-09-17",
+    "temporalResolution": "daily composite; per-pixel acquisition time not provided by WMS image",
+    "url": "https://gibs.earthdata.nasa.gov/wms/epsg3857/best/wms.cgi?SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&LAYERS=VIIRS_SNPP_CorrectedReflectance_TrueColor&STYLES=&SRS=EPSG%3A3857&BBOX=1063401.2038180765%2C5910900.252768108%2C1383401.2038180765%2C6110900.252768108&WIDTH=1440&HEIGHT=900&FORMAT=image%2Fjpeg&TIME=2026-09-17",
+    "file": "data/raw/viirs-20260917.jpg",
+    "sha256": "d9d6b19b7c02205913436a2a545cf1c2b3f5b42b8c2786d4155d761dfca3b452",
+    "retrievedUtc": "2026-09-24T03:56:15.367196+00:00",
+    "bytes": 177703
+  },
+  {
+    "title": "NASA GIBS / Suomi NPP VIIRS corrected reflectance true color",
+    "date": "2026-09-18",
+    "temporalResolution": "daily composite; per-pixel acquisition time not provided by WMS image",
+    "url": "https://gibs.earthdata.nasa.gov/wms/epsg3857/best/wms.cgi?SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&LAYERS=VIIRS_SNPP_CorrectedReflectance_TrueColor&STYLES=&SRS=EPSG%3A3857&BBOX=1063401.2038180765%2C5910900.252768108%2C1383401.2038180765%2C6110900.252768108&WIDTH=1440&HEIGHT=900&FORMAT=image%2Fjpeg&TIME=2026-09-18",
+    "file": "data/raw/viirs-20260918.jpg",
+    "sha256": "4ee6671e5eeaad70090fa1c0111955fb537ad66f62aee93164fed81f4a4320f5",
+    "retrievedUtc": "2026-09-24T03:56:15.368198+00:00",
+    "bytes": 119259
+  },
+  {
+    "title": "NASA GIBS / Suomi NPP VIIRS corrected reflectance true color",
+    "date": "2026-09-19",
+    "temporalResolution": "daily composite; per-pixel acquisition time not provided by WMS image",
+    "url": "https://gibs.earthdata.nasa.gov/wms/epsg3857/best/wms.cgi?SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&LAYERS=VIIRS_SNPP_CorrectedReflectance_TrueColor&STYLES=&SRS=EPSG%3A3857&BBOX=1063401.2038180765%2C5910900.252768108%2C1383401.2038180765%2C6110900.252768108&WIDTH=1440&HEIGHT=900&FORMAT=image%2Fjpeg&TIME=2026-09-19",
+    "file": "data/raw/viirs-20260919.jpg",
+    "sha256": "34413dce334395d27d608074adef2d0bc2134124341c9b68ea528cbbbb5a4ae8",
+    "retrievedUtc": "2026-09-24T03:56:15.368198+00:00",
+    "bytes": 178429
+  },
+  {
+    "title": "NASA GIBS / Suomi NPP VIIRS corrected reflectance true color",
+    "date": "2026-09-20",
+    "temporalResolution": "daily composite; per-pixel acquisition time not provided by WMS image",
+    "url": "https://gibs.earthdata.nasa.gov/wms/epsg3857/best/wms.cgi?SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&LAYERS=VIIRS_SNPP_CorrectedReflectance_TrueColor&STYLES=&SRS=EPSG%3A3857&BBOX=1063401.2038180765%2C5910900.252768108%2C1383401.2038180765%2C6110900.252768108&WIDTH=1440&HEIGHT=900&FORMAT=image%2Fjpeg&TIME=2026-09-20",
+    "file": "data/raw/viirs-20260920.jpg",
+    "sha256": "56106d6dd295c11c45f93b2cb8b8291b0346b773b1042805d501d607dffaec2d",
+    "retrievedUtc": "2026-09-24T03:56:15.370196+00:00",
+    "bytes": 137697
+  }
+]
