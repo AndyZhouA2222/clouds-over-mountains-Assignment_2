@@ -9,8 +9,10 @@
   --snow: #f2f5ef;
   --fog: #a4b5af;
   --hairline: #d5e2dc30;
+  --display: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", "SimSun", Georgia, serif;
+  --sans: "Segoe UI", "Microsoft YaHei UI", "PingFang SC", "Microsoft YaHei", sans-serif;
   color: var(--snow);
-  font-family: "Arial Narrow", "Helvetica Neue", "Microsoft YaHei UI", "Microsoft YaHei", sans-serif;
+  font-family: var(--sans);
   font-size: 15px;
 }
 
@@ -145,9 +147,11 @@ input:focus-visible,
   max-width: 780px;
   margin: 0;
   color: var(--snow);
+  font-family: var(--display);
   font-size: clamp(34px, 4.4vw, 64px);
-  font-weight: 600;
-  line-height: 1.25;
+  font-weight: 500;
+  letter-spacing: 0.015em;
+  line-height: 1.28;
 }
 
 .stage-title > p:last-child {
@@ -515,6 +519,20 @@ input:focus-visible,
   cursor: default;
 }
 
+.map-controls button,
+.hour-readout button,
+.dialog-head button {
+  transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease;
+}
+
+.map-controls button:hover:not(:disabled),
+.hour-readout button:hover,
+.dialog-head button:hover {
+  border-color: var(--ice);
+  background: #a6ffe51c;
+  color: var(--ice);
+}
+
 .height-legend {
   position: absolute;
   z-index: 4;
@@ -705,6 +723,7 @@ input:focus-visible,
 .cth-heading h2 {
   margin: 8px 0 4px;
   color: var(--snow);
+  font-family: var(--display);
   font-size: 18px;
   font-weight: 500;
 }
@@ -819,6 +838,7 @@ input:focus-visible,
 .analysis-head h2 {
   margin: 0;
   color: var(--snow);
+  font-family: var(--display);
   font-size: 27px;
   font-weight: 500;
 }
@@ -984,6 +1004,7 @@ dialog::backdrop {
 
 .dialog-head h2 {
   margin: 0;
+  font-family: var(--display);
   font-size: 22px;
   font-weight: 500;
 }
@@ -1926,29 +1947,34 @@ dialog::backdrop {
   }
 
   .day-choice {
-    min-height: 37px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    min-height: 42px;
     padding-top: 4px;
   }
 
   .day-choice span {
-    font-size: 6px;
+    font-size: 8px;
   }
 
   .day-choice strong {
+    order: 2;
     margin-top: 3px;
-    font-size: 10px;
+    font-size: 11px;
   }
 
   .height-legend {
     bottom: 103px;
     left: 12px;
     width: 165px;
-    font-size: 7px;
+    font-size: 8px;
   }
 
   .legend-values,
   .height-legend > small {
-    font-size: 6px;
+    font-size: 7px;
   }
 
   .cth-frame-readout {
@@ -1959,7 +1985,7 @@ dialog::backdrop {
 
   .cth-frame-readout span,
   .cth-frame-readout small {
-    font-size: 6px;
+    font-size: 7px;
   }
 
   .cth-frame-readout strong {
@@ -1974,7 +2000,7 @@ dialog::backdrop {
     gap: 7px;
     min-height: 39px;
     padding: 0 7px;
-    font-size: 7px;
+    font-size: 8px;
   }
 
   .map-controls {
@@ -1985,8 +2011,8 @@ dialog::backdrop {
   }
 
   .map-controls button {
-    width: 25px;
-    height: 25px;
+    width: 32px;
+    height: 32px;
     font-size: 14px;
   }
 
@@ -2013,7 +2039,7 @@ dialog::backdrop {
   }
 
   .cth-heading p {
-    font-size: 8px;
+    font-size: 9px;
   }
 
   .cth-stat {
@@ -2023,7 +2049,7 @@ dialog::backdrop {
 
   .cth-stat span,
   .cth-stat small {
-    font-size: 7px;
+    font-size: 8px;
   }
 
   .cth-stat strong {
@@ -2042,5 +2068,41 @@ dialog::backdrop {
     max-width: none;
     font-size: 7px;
     text-align: left;
+  }
+}
+
+.map-controls button {
+  width: 34px;
+  height: 34px;
+  touch-action: manipulation;
+}
+
+.hour-readout button {
+  width: 36px;
+  height: 36px;
+  touch-action: manipulation;
+}
+
+#cth-chart {
+  touch-action: pan-y;
+}
+
+@media (max-width: 640px) {
+  .panel-label span,
+  .panel-label small,
+  .scene-title-lockup > span,
+  .scene-title-lockup > small,
+  .rail-label,
+  .scene-data-rail > small,
+  .scene-data-rail > div,
+  .stage-dates > span,
+  .map-note,
+  .cth-frame-control {
+    font-size: 8px;
+  }
+
+  .hour-readout button {
+    width: 32px;
+    height: 32px;
   }
 }

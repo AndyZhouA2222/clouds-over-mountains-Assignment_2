@@ -83,6 +83,15 @@
     $('cth-map-median').textContent = item.median == null ? '—' : `${(item.median / 1000).toFixed(2)} km`;
     $('cth-map-valid').textContent = `有效格点 ${item.count} / ${cth.latitudes.length * cth.longitudes.length}`;
     $('cth-slider').value = selectedIndex;
+    svg.setAttribute('aria-valuemin', '0');
+    svg.setAttribute('aria-valuemax', String(cthStats.length - 1));
+    svg.setAttribute('aria-valuenow', String(selectedIndex));
+    svg.setAttribute('aria-valuetext', `${frameUtc.slice(11, 16)} UTC，区域中位数 ${item.median == null ? '无有效值' : `${(item.median / 1000).toFixed(2)} km`}`);
+  }
+  function selectCthFrame(index) {
+    state.cthIndex = clamp(Number(index), 0, cthStats.length - 1);
+    renderCthChart();
+    drawCloudReference();
   }
   function renderMap() {
     const day = data.days[state.day];
@@ -104,7 +113,19 @@
     $('scene-date').innerHTML = `${day.date.slice(8, 10)}<span>SEP</span>`; $('selected-time').innerHTML = `${String(state.hour).padStart(2, '0')}:00 <small>UTC</small>`; $('time-slider').value = state.hour;
     renderCthChart();
   }
-  function pathFor(frames, key, width, height, pad, min, max, denominator = 23) { return frames.map((item, index) => { if (item[key] == null) return null; const x = pad.left + index / denominator * (width - pad.left - pad.right); const y = pad.top + (max - item[key]) / (max - min) * (height - pad.top - pad.bottom); return `${index ? 'L' : 'M'}${x.toFixed(1)},${y.toFixed(1)}`; }).filter(Boolean).join(' '); }
+  function pathFor(frames, key, width, height, pad, min, max, denominator = 23) {
+    const commands = [];
+    let drawing = false;
+    frames.forEach((item, index) => {
+      const value = item[key];
+      if (value == null || !Number.isFinite(value)) { drawing = false; return; }
+      const x = pad.left + index / denominator * (width - pad.left - pad.right);
+      const y = pad.top + (max - value) / (max - min) * (height - pad.top - pad.bottom);
+      commands.push(`${drawing ? 'L' : 'M'}${x.toFixed(1)},${y.toFixed(1)}`);
+      drawing = true;
+    });
+    return commands.join(' ');
+  }
   function renderChart() {
     const svg = $('analysis-chart'); const width = Math.max(1, svg.parentElement.clientWidth || 900); const height = 220; const pad = { left: 43, right: 18, top: 17, bottom: 30 }; const values = data.days.flatMap((d) => d.frames.map((f) => f.delta)).filter((value) => value != null); const min = Math.floor(Math.min(...values) - 2); const max = Math.ceil(Math.max(...values) + 2);
     svg.setAttribute('viewBox', `0 0 ${width} ${height}`); svg.innerHTML = ''; for (let tick = min; tick <= max; tick += 5) { const y = pad.top + (max - tick) / (max - min) * (height - pad.top - pad.bottom); svg.insertAdjacentHTML('beforeend', `<line class="chart-grid" x1="${pad.left}" x2="${width - pad.right}" y1="${y}" y2="${y}"/><text class="chart-axis" x="${pad.left - 9}" y="${y + 4}" text-anchor="end">${tick}</text>`); }
@@ -112,20 +133,27 @@
     const cursorX = pad.left + state.day / 6 * (width - pad.left - pad.right); svg.insertAdjacentHTML('beforeend', `<path class="daily-line" d="${dailyPath}"/><path class="selected-line" d="${hourlyPath}"/><line class="day-cursor" x1="${cursorX}" x2="${cursorX}" y1="${pad.top}" y2="${height - pad.bottom}"/><text class="chart-label" x="${pad.left}" y="${height - 7}">14 SEP</text><text class="chart-label" x="${width / 2}" y="${height - 7}" text-anchor="middle">17 SEP</text><text class="chart-label" x="${width - pad.right}" y="${height - 7}" text-anchor="end">20 SEP</text>`);
   }
   function render() { renderDayStrip(); renderReadings(); renderMap(); renderChart(); }
-  function updateProvenanceCopy() {
-    const sections = document.querySelectorAll('#data-dialog .dialog-body section');
-    if (sections[0]) sections[0].querySelector('p').textContent = '01550 Garmisch-Partenkirchen（719 m）与 05792 Zugspitze（2,956 m），2026-09-14 至 20，共 336 条小时记录，168 组配对。原始时间为 UTC，单位 °C，缺测不插补。';
-    if (sections[2]) sections[2].querySelector('p').textContent = '14–20 日 Suomi NPP / VIIRS 真彩色日合成影像。地形参考为 Esri World Imagery 拼接底图，日期未知。两种底图都保持 1440×900 EPSG:3857 比例。';
-  }
   function setDay(index) { state.day = Number(index); state.hour = 12; render(); }
   function setZoom(next) { state.zoom = clamp(next, 1, 2.25); for (const id of ['map-world', 'cth-world']) $(id).style.transform = `scale(${state.zoom})`; $('zoom-in').disabled = state.zoom >= 2.25; $('zoom-out').disabled = state.zoom <= 1; }
   function stopPlayback() { clearInterval(timer); timer = null; state.playing = false; $('play-button').setAttribute('aria-label', '播放时间序列'); $('play-button').innerHTML = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 9 6-9 6Z"/></svg>'; }
   function togglePlayback() { if (state.playing) return stopPlayback(); state.playing = true; $('play-button').setAttribute('aria-label', '暂停时间序列'); $('play-button').innerHTML = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 4h3v12H5zm7 0h3v12h-3z"/></svg>'; timer = setInterval(() => { state.hour = state.hour >= 23 ? 0 : state.hour + 1; renderReadings(); renderChart(); }, 700); }
   document.addEventListener('click', (event) => { const day = event.target.closest('[data-day]'); if (day) return setDay(day.dataset.day); });
   $('time-slider').addEventListener('input', (event) => { stopPlayback(); state.hour = Number(event.target.value); renderReadings(); renderChart(); }); $('play-button').addEventListener('click', togglePlayback);
-  $('cth-slider').addEventListener('input', (event) => { state.cthIndex = Number(event.target.value); renderCthChart(); drawCloudReference(); });
-  $('cth-chart').addEventListener('click', (event) => { const svg = $('cth-chart'); const box = svg.getBoundingClientRect(); const width = svg.viewBox.baseVal.width; const px = (event.clientX - box.left) / box.width * width; const ratio = clamp((px - 45) / (width - 57), 0, 1); state.cthIndex = Math.round(ratio * (cthStats.length - 1)); renderCthChart(); drawCloudReference(); });
+  $('cth-slider').addEventListener('input', (event) => selectCthFrame(event.target.value));
+  $('cth-chart').addEventListener('click', (event) => { const svg = $('cth-chart'); const box = svg.getBoundingClientRect(); const width = svg.viewBox.baseVal.width; const px = (event.clientX - box.left) / box.width * width; const ratio = clamp((px - 45) / (width - 57), 0, 1); selectCthFrame(Math.round(ratio * (cthStats.length - 1))); });
+  $('cth-chart').addEventListener('keydown', (event) => {
+    let next = state.cthIndex;
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') next -= 1;
+    else if (event.key === 'ArrowRight' || event.key === 'ArrowUp') next += 1;
+    else if (event.key === 'PageDown') next -= 3;
+    else if (event.key === 'PageUp') next += 3;
+    else if (event.key === 'Home') next = 0;
+    else if (event.key === 'End') next = cthStats.length - 1;
+    else return;
+    event.preventDefault();
+    selectCthFrame(next);
+  });
   $('zoom-in').addEventListener('click', () => setZoom(state.zoom + .25)); $('zoom-out').addEventListener('click', () => setZoom(state.zoom - .25)); $('reset-map').addEventListener('click', () => setZoom(1)); $('map-frame').addEventListener('wheel', (event) => { event.preventDefault(); setZoom(state.zoom + (event.deltaY < 0 ? .1 : -.1)); }, { passive: false });
   $('about-button').addEventListener('click', () => $('data-dialog').showModal()); $('close-dialog').addEventListener('click', () => $('data-dialog').close()); $('map-image').addEventListener('error', () => $('map-error').hidden = false); $('cth-image').addEventListener('error', () => $('cth-map-error').hidden = false); window.addEventListener('resize', () => { fitMapToFrames(); renderChart(); renderCthChart(); }); document.addEventListener('visibilitychange', () => { if (document.hidden) stopPlayback(); });
-  fitMapToFrames(); setZoom(1); updateProvenanceCopy(); render();
+  fitMapToFrames(); setZoom(1); render();
 })();

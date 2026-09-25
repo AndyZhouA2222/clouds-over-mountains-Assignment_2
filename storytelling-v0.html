@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#050a0a">
+  <title>Zugspitze — Field Notes / v0</title>
+  <meta name="description" content="楚格峰云场观测故事的设计方向预览。">
+  <style>
+    :root {
+      color-scheme: dark;
+      --night: #050a0a;
+      --deep: #0c1515;
+      --ice: #a6ffe5;
+      --snow: #f2f5ef;
+      --fog: #a4b5af;
+      --warm: #dda657;
+      --line: #d5e2dc30;
+      --serif: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", "SimSun", Georgia, serif;
+      --sans: "Segoe UI", "Microsoft YaHei UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      --mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+      font-family: var(--sans);
+      background: var(--night);
+      color: var(--snow);
+      scroll-behavior: smooth;
+      font-synthesis: none;
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; background: var(--night); }
+    a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 5px; }
+    a:focus-visible { outline: 2px solid var(--ice); outline-offset: 5px; }
+    img { display: block; max-width: 100%; outline: 1px solid oklch(1 0 0 / 0.1); outline-offset: -1px; }
+    button, input { font: inherit; }
+    ::selection { color: var(--night); background: var(--ice); }
+
+    .topline {
+      position: absolute;
+      z-index: 2;
+      inset: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 24px clamp(20px, 5vw, 76px);
+      color: var(--snow);
+      font: 10px/1.5 var(--mono);
+      letter-spacing: .08em;
+      text-shadow: 0 1px 8px #000;
+    }
+    .wordmark { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .wordmark-mark { color: var(--ice); font-size: 22px; }
+    .wordmark small { display: block; color: #d3ded8c7; font-size: 8px; }
+    .topline a:last-child { color: var(--ice); }
+
+    .hero { position: relative; min-height: 92svh; display: grid; align-content: end; }
+    .hero-media { position: absolute; inset: 0; display: grid; place-items: center; overflow: hidden; background: #08100f; }
+    .hero-media img { width: 100%; height: 100%; object-fit: contain; }
+    .hero-shade { position: absolute; inset: 0; background: linear-gradient(90deg, #030707a8, transparent 84%), linear-gradient(0deg, #030707eb 0%, #03070740 34%, transparent 68%); pointer-events: none; }
+    .hero-copy { position: relative; z-index: 1; width: min(1440px, 100%); margin: 0 auto; padding: clamp(160px, 28vh, 270px) clamp(22px, 8vw, 124px) 72px; }
+    .eyebrow, .chapter-index, .data-label { color: var(--ice); font: 10px/1.5 var(--mono); letter-spacing: .1em; }
+    h1, h2, h3, p { text-wrap: pretty; }
+    h1 { max-width: 900px; margin: 18px 0 14px; font: 500 clamp(42px, 7.1vw, 100px)/1.18 var(--serif); letter-spacing: .015em; text-wrap: balance; }
+    .hero-deck { max-width: 570px; margin: 0; color: #e1eae5; font-size: clamp(14px, 1.3vw, 17px); line-height: 1.9; }
+    .hero-foot { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-top: 38px; }
+    .hero-source { color: #dae5debd; font: 9px/1.7 var(--mono); }
+    .scroll-cue { display: flex; align-items: center; gap: 11px; color: var(--warm); font: 9px/1.5 var(--mono); letter-spacing: .08em; text-decoration: none; }
+    .scroll-cue::after { content: "↓"; display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid #dda65780; font-size: 16px; }
+
+    .chapter { position: relative; padding: clamp(88px, 13vw, 184px) clamp(22px, 8vw, 124px); border-top: 1px solid var(--line); }
+    .chapter-inner { width: min(1190px, 100%); margin: 0 auto; }
+    .chapter-head { display: grid; grid-template-columns: minmax(100px, .45fr) minmax(0, 1.55fr); gap: 28px; align-items: start; margin-bottom: 44px; }
+    .chapter-index { padding-top: 12px; white-space: nowrap; }
+    h2 { max-width: 850px; margin: 0; font: 500 clamp(30px, 4vw, 58px)/1.25 var(--serif); text-wrap: balance; }
+    .chapter-intro { max-width: 620px; margin: 15px 0 0; color: var(--fog); font-size: 14px; line-height: 1.9; }
+    .week-strip { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 9px; }
+    .week-shot { min-width: 0; margin: 0; }
+    .week-shot img { width: 100%; aspect-ratio: 1.6; object-fit: contain; background: #101716; }
+    .week-shot figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 5px; padding-top: 10px; color: var(--fog); font: 9px/1.5 var(--mono); }
+    .week-shot time { color: var(--snow); }
+    .placeholder-tag { color: var(--warm); }
+    .week-summary { display: grid; grid-template-columns: minmax(0, 1fr) minmax(190px, .38fr); gap: 32px; align-items: center; margin-top: 64px; }
+    .week-summary img { width: 100%; height: auto; background: var(--deep); }
+    .summary-note { padding-left: 23px; border-left: 1px solid var(--warm); }
+    .summary-note h3 { margin: 0 0 11px; color: var(--warm); font: 11px/1.4 var(--mono); letter-spacing: .08em; }
+    .summary-note p { margin: 0; color: var(--fog); font-size: 12px; line-height: 1.85; }
+
+    .reference { overflow: hidden; background: var(--deep); }
+    .reference-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(230px, .65fr); gap: clamp(30px, 7vw, 96px); align-items: center; }
+    .reference-plate { position: relative; min-width: 0; background: #07100f; }
+    .reference-plate img { width: 100%; aspect-ratio: 1.6; object-fit: contain; filter: saturate(.6) brightness(.72); }
+    .reference-placeholder { position: absolute; inset: 0; display: grid; align-content: center; justify-items: center; gap: 12px; padding: 20px; text-align: center; background: linear-gradient(0deg, #050a0aa8, #050a0a12 75%); }
+    .reference-placeholder strong { max-width: 390px; font: 500 clamp(20px, 3vw, 36px)/1.3 var(--serif); }
+    .reference-placeholder p { max-width: 390px; margin: 0; color: #e3ece5c7; font-size: 11px; line-height: 1.7; }
+    .reference-copy h2 { margin-top: 13px; }
+    .frame-markers { display: flex; gap: 5px; margin-top: 29px; }
+    .frame-markers i { flex: 1; height: 3px; background: #a6ffe53a; }
+    .frame-markers i:first-child { background: var(--ice); }
+    .reference-copy .chapter-intro { max-width: 450px; }
+
+    .closing { min-height: 76svh; display: grid; align-items: center; background: radial-gradient(ellipse at 70% 70%, #263026 0, var(--night) 53%); }
+    .closing-copy { max-width: 1030px; margin: 0 auto; }
+    .closing h2 { max-width: 900px; margin-top: 20px; font-size: clamp(36px, 6vw, 78px); }
+    .closing-note { max-width: 640px; margin: 24px 0 0; color: #c1cdc6; font-size: 14px; line-height: 2; }
+    .closing-links { display: flex; flex-wrap: wrap; gap: 20px 30px; margin-top: 36px; color: var(--ice); font: 10px/1.5 var(--mono); }
+    footer { display: flex; justify-content: space-between; gap: 20px; padding: 24px clamp(22px, 8vw, 124px) 30px; border-top: 1px solid var(--line); color: #91a49b; font: 9px/1.8 var(--mono); }
+
+    [data-reveal] { opacity: 1; transform: none; }
+    .motion-ready [data-reveal] { opacity: 0; transform: translateY(24px); filter: blur(4px); transition: opacity 560ms cubic-bezier(.2,.7,.2,1), transform 560ms cubic-bezier(.2,.7,.2,1), filter 560ms cubic-bezier(.2,.7,.2,1); }
+    .motion-ready [data-reveal].is-visible { opacity: 1; transform: translateY(0); filter: blur(0); }
+    .motion-ready .week-shot:nth-child(2) { transition-delay: 70ms; }
+    .motion-ready .week-shot:nth-child(3) { transition-delay: 120ms; }
+    .motion-ready .week-shot:nth-child(4) { transition-delay: 170ms; }
+    .motion-ready .week-shot:nth-child(5) { transition-delay: 220ms; }
+    .motion-ready .week-shot:nth-child(6) { transition-delay: 270ms; }
+    .motion-ready .week-shot:nth-child(7) { transition-delay: 320ms; }
+    @media (prefers-reduced-motion: reduce) {
+      :root { scroll-behavior: auto; }
+      .motion-ready [data-reveal] { opacity: 1; transform: none; filter: none; transition: none; }
+    }
+    @media (max-width: 760px) {
+      .topline { padding: 17px 18px; }
+      .topline .top-meta { display: none; }
+      .hero { min-height: 0; }
+      .hero-media { position: relative; aspect-ratio: 1.6; }
+      .hero-media img { width: 100%; height: 100%; }
+      .hero-shade { background: linear-gradient(0deg, #030707eb 0%, #03070730 48%, #03070735 100%); }
+      .hero-copy { padding: 0 21px 26px; margin-top: -118px; }
+      h1 { max-width: 620px; font-size: clamp(38px, 11vw, 62px); }
+      .hero-foot { align-items: start; margin-top: 22px; }
+      .scroll-cue { gap: 7px; font-size: 8px; }
+      .scroll-cue::after { width: 30px; height: 30px; }
+      .chapter { padding: 86px 20px; }
+      .chapter-head { grid-template-columns: 1fr; gap: 11px; margin-bottom: 28px; }
+      .chapter-index { padding-top: 0; }
+      .week-strip { grid-template-columns: repeat(7, minmax(128px, 1fr)); overflow-x: auto; padding: 0 2px 12px; scroll-snap-type: x mandatory; }
+      .week-shot { scroll-snap-align: start; }
+      .week-summary { grid-template-columns: 1fr; gap: 22px; margin-top: 34px; }
+      .summary-note { max-width: 500px; }
+      .reference-grid { grid-template-columns: 1fr; gap: 29px; }
+      .reference-copy { grid-row: 1; }
+      .reference-plate { grid-row: 2; }
+      .closing { min-height: 68svh; }
+      .closing-links { gap: 15px 20px; }
+      footer { display: grid; grid-template-columns: 1fr; gap: 5px; padding: 20px; }
+    }
+    @media (max-width: 420px) {
+      .hero-copy { margin-top: -90px; }
+      .hero-deck { font-size: 13px; }
+      .hero-foot { gap: 12px; }
+      .hero-source { max-width: 52%; font-size: 8px; }
+      .scroll-cue { letter-spacing: 0; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topline">
+    <a class="wordmark" href="#top"><span class="wordmark-mark" aria-hidden="true">∧</span><span>ZUGSPITZE<small>ATMOSPHERIC FIELD / 2026</small></span></a>
+    <span class="top-meta">DWD × NASA GIBS · 47.421° N / 10.985° E</span>
+    <a href="#sources">来源与数据 ↓</a>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-media" aria-hidden="true">
+        <img src="data/raw/viirs-20260920.jpg" alt="">
+        <div class="hero-shade"></div>
+      </div>
+      <div class="hero-copy">
+        <span class="eyebrow">FIELD NOTE 01 / ZUGSPITZE · 14—20 SEP</span>
+        <h1 id="hero-title">山谷升温时，<br>云顶发生了什么？</h1>
+        <p class="hero-deck">一周卫星影像，168 组山谷与山顶的逐小时配对观测。两种视角，沿着同一片山地展开。</p>
+        <div class="hero-foot">
+          <span class="hero-source">NASA VIIRS / DAILY COMPOSITE<br>当前画面：2026-09-20 · UTC</span>
+          <a class="scroll-cue" href="#field-week">进入这一周 <span>SCROLL TO OBSERVE</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter" id="field-week" aria-labelledby="week-title">
+      <div class="chapter-inner">
+        <div class="chapter-head" data-reveal>
+          <span class="chapter-index">01 / 04<br>14—20 SEP</span>
+          <div><h2 id="week-title">七天，云场缓慢换形。</h2><p class="chapter-intro">先看影像的变化，再对照山谷与山顶的温差。每一格是当天的 VIIRS 真彩色日合成；温差峰值会在正式版接入原始配对观测。</p></div>
+        </div>
+        <div class="week-strip" aria-label="2026 年 9 月 14 日至 20 日的 NASA VIIRS 影像">
+          <figure class="week-shot" data-reveal><img src="data/raw/viirs-20260914.jpg" alt="2026 年 9 月 14 日 NASA VIIRS 真彩色影像" loading="lazy"><figcaption><time datetime="2026-09-14">14 SEP</time><span>ΔT —°</span></figcaption></figure>
+          <figure class="week-shot" data-reveal><img src="data/raw/viirs-20260915.jpg" alt="2026 年 9 月 15 日 NASA VIIRS 真彩色影像" loading="lazy"><figcaption><time datetime="2026-09-15">15 SEP</time><span>ΔT —°</span></figcaption></figure>
+          <figure class="week-shot" data-reveal><img src="data/raw/viirs-20260916.jpg" alt="2026 年 9 月 16 日 NASA VIIRS 真彩色影像" loading="lazy"><figcaption><time datetime="2026-09-16">16 SEP</time><span>ΔT —°</span></figcaption></figure>
+          <figure class="week-shot" data-reveal><img src="data/raw/viirs-20260917.jpg" alt="2026 年 9 月 17 日 NASA VIIRS 真彩色影像" loading="lazy"><figcaption><time datetime="2026-09-17">17 SEP</time><span>ΔT —°</span></figcaption></figure>
+          <figure class="week-shot" data-reveal><img src="data/raw/viirs-20260918.jpg" alt="2026 年 9 月 18 日 NASA VIIRS 真彩色影像" loading="lazy"><figcaption><time datetime="2026-09-18">18 SEP</time><span>ΔT —°</span></figcaption></figure>
+          <figure class="week-shot" data-reveal><img src="data/raw/viirs-20260919.jpg" alt="2026 年 9 月 19 日 NASA VIIRS 真彩色影像" loading="lazy"><figcaption><time datetime="2026-09-19">19 SEP</time><span>ΔT —°</span></figcaption></figure>
+          <figure class="week-shot" data-reveal><img src="data/raw/viirs-20260920.jpg" alt="2026 年 9 月 20 日 NASA VIIRS 真彩色影像" loading="lazy"><figcaption><time datetime="2026-09-20">20 SEP</time><span>ΔT —°</span></figcaption></figure>
+        </div>
+        <div class="week-summary" data-reveal>
+          <img src="out/plot.svg" alt="七张 NASA VIIRS 日影像与 9 月 14 日至 20 日逐小时山谷减山顶温差图" loading="lazy">
+          <aside class="summary-note"><h3>OBSERVED TOGETHER</h3><p>168 组配对观测记录山谷温度减山顶温度。图表负责描述这段时间的变化；它本身不能判断云的类型，也不能证明温差造成了云层变化。</p></aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter reference" id="cth-reference" aria-labelledby="reference-title">
+      <div class="chapter-inner reference-grid">
+        <div class="reference-plate" data-reveal>
+          <img src="assets/terrain-mercator.jpg" alt="楚格峰区域 Esri 地形参考底图，影像日期未知" loading="lazy">
+          <div class="reference-placeholder"><span class="eyebrow">DWD FCI / 22 SEP · 13 FRAMES</span><strong>云顶高度参考层<br>[现有格网待接入]</strong><p>这一幕沿用现有 44 × 99 CTH 格网与逐帧控制；底图日期未知，透明格点不代表晴空。</p></div>
+        </div>
+        <div class="reference-copy" data-reveal>
+          <span class="chapter-index">02 / 04<br>22 SEP · SEPARATE SCAN</span>
+          <h2 id="reference-title">另一日的云顶剖面。</h2>
+          <p class="chapter-intro">CTH 产品采于 9 月 22 日。这是一段独立参考观测，与前一周的 VIIRS 影像并列阅读，不叠成同期场景。</p>
+          <div class="frame-markers" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <span class="data-label">06:08—18:08 UTC · 13 OBSERVATION FRAMES</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter closing" id="limits" aria-labelledby="limits-title">
+      <div class="chapter-inner closing-copy" data-reveal>
+        <span class="chapter-index">03 / 04 · INTERPRETATION LIMIT</span>
+        <h2 id="limits-title">并置，提供线索。<br>不替天气下结论。</h2>
+        <p class="closing-note">VIIRS 日合成覆盖 9 月 14—20 日；DWD 云顶高度参考采于 9 月 22 日。两组资料日期不同，不作同期叠加。温差和云顶高度都不能单独证明积雨云。</p>
+        <div class="closing-links"><a href="#field-week">重看这一周 ↑</a><a href="#sources">查看数据来源 ↓</a></div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="sources">
+    <span>ZUGSPITZE / CLOUD FIELD STUDY · V0 DIRECTION PREVIEW</span>
+    <span>DWD · NASA GIBS · ESRI / 资料与交互会在确认后接回正式页面</span>
+  </footer>
+
+  <script>
+    (() => {
+      const scenes = [...document.querySelectorAll('[data-reveal]')];
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduceMotion || !('IntersectionObserver' in window)) {
+        scenes.forEach((scene) => scene.classList.add('is-visible'));
+        return;
+      }
+      document.documentElement.classList.add('motion-ready');
+      const observer = new IntersectionObserver((entries, currentObserver) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            currentObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -5% 0px' });
+      scenes.forEach((scene) => observer.observe(scene));
+    })();
+  </script>
+</body>
+</html>

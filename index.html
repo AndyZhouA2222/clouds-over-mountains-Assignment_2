@@ -7,7 +7,6 @@
   <meta name="description" content="楚格峰地区的七天 NASA VIIRS 云图与 DWD 山谷、山顶逐小时温差探索。">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='8' fill='%231b302e'/%3E%3Cpath d='M6 30 20 8l14 22M12 20l8 5 8-5' fill='none' stroke='%23f4bb63' stroke-width='2.5'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="field-study.css">
   <link rel="stylesheet" href="field-theory.css">
   <script defer src="data/observations.js"></script>
   <script defer src="data/clouds.js"></script>
@@ -56,7 +55,7 @@
       <section class="cth-profile" aria-labelledby="cth-heading">
         <div class="cth-heading"><span class="cth-tag">REFERENCE SCAN / 22 SEP</span><h2 id="cth-heading">云顶高度分布随时间变化</h2><p>纵轴 km，横轴 UTC；颜色表示高度区间，亮度表示有效格点中的相对占比，白线为区域中位数。</p></div>
         <div class="cth-stat"><span>选定帧区域中位数</span><strong id="cth-median">—</strong><small id="cth-frame-label">--:08 UTC</small></div>
-        <svg id="cth-chart" role="img" aria-label="2026 年 9 月 22 日 13 帧各云顶高度区间格点比例热图，纵轴为公里，横轴为 UTC，白线为中位数"></svg>
+        <svg id="cth-chart" role="slider" tabindex="0" aria-valuemin="0" aria-valuemax="12" aria-valuenow="0" aria-valuetext="06:08 UTC" aria-label="选择 2026 年 9 月 22 日云顶高度时间帧，按左右方向键逐帧调整；热图纵轴为公里，横轴为 UTC，白线为中位数"></svg>
         <span class="cth-range-note" id="cth-range-note">有效格点比例与 P10–P90：—</span>
       </section>
     </section>
