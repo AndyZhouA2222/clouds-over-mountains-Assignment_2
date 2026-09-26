@@ -84,6 +84,23 @@ def build_svg(frames):
     if not valid:
         raise ValueError("No paired hourly temperatures are available for the selected week.")
     values = [frame["delta"] for frame in valid]
+    peak_rows = []
+    for day_index in range(len(DAYS)):
+        day_frames = frames[day_index * 24:(day_index + 1) * 24]
+        available = [(day_index * 24 + i, frame) for i, frame in enumerate(day_frames)
+                     if frame["delta"] is not None]
+        if available:
+            peak_rows.append(max(available, key=lambda pair: pair[1]["delta"]))
+    daily_peaks = [frame["delta"] for _, frame in peak_rows]
+    finding_title = (
+        f"The valley was warmer in all {len(valid)} observed hours"
+        if min(values) > 0 else f"Temperature contrasts across {len(valid)} observed hours"
+    )
+    finding_detail = (
+        f"Hourly gap: {min(values):.1f}–{max(values):.1f} °C; "
+        f"daily peaks: {min(daily_peaks):.1f}–{max(daily_peaks):.1f} °C. "
+        "ΔT = valley − summit."
+    )
     y_min = min(0, math.floor(min(values) / 2) * 2 - 2)
     y_max = math.ceil(max(values) / 2) * 2 + 2
 
@@ -98,7 +115,8 @@ def build_svg(frames):
         f'width="{width}" height="{height}" viewBox="0 0 {width} {height}" '
         'role="img" aria-labelledby="title description">',
         '<title id="title">Clouds over the Zugspitze, 14 to 20 September 2026</title>',
-        '<desc id="description">Seven NASA VIIRS daily satellite composites above a chart of 168 hourly temperature differences between Garmisch-Partenkirchen and Zugspitze.</desc>',
+        '<desc id="description">Seven NASA VIIRS daily satellite composites above a chart of hourly temperature differences between Garmisch-Partenkirchen and Zugspitze. '
+        f'{html.escape(finding_title)}. {html.escape(finding_detail)}</desc>',
         '<defs><linearGradient id="paper" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f7f8f4"/><stop offset="1" stop-color="#eef2ed"/></linearGradient>',
         '<clipPath id="chartClip"><rect x="126" y="552" width="1366" height="348"/></clipPath>',
     ]
@@ -133,13 +151,14 @@ def build_svg(frames):
     parts.extend([
         '<line x1="80" y1="402" x2="1520" y2="402" stroke="#e3e8e2"/>',
         text(left, 448, "02  /  TEMPERATURE CONTRAST", 12, "#31413d", 700, extra='letter-spacing="1.1"'),
-        text(left, 478, "Valley minus summit", 24, "#203330", 600),
-        text(left, 504, "Hourly air temperature difference  ·  ΔT = Garmisch-Partenkirchen − Zugspitze", 13, "#71807b"),
+        text(left, 478, finding_title, 24, "#203330", 600),
+        text(left, 504, finding_detail, 14, "#51615b"),
         '<line x1="1190" y1="474" x2="1222" y2="474" stroke="#bd6548" stroke-width="3" stroke-linecap="round"/>',
         text(1232, 479, "hourly ΔT", 12, "#52615b", 550),
         '<circle cx="1373" cy="474" r="4.5" fill="#ffffff" stroke="#bd6548" stroke-width="2.5"/>',
         text(1386, 479, "daily maximum", 12, "#52615b", 550),
         '<rect x="126" y="552" width="1366" height="348" fill="#fbfcfa" stroke="#e7ece7"/>',
+        text(plot_left, 538, "ΔT (°C)", 13, "#31413d", 600),
     ])
 
     tick_step = 2 if y_max - y_min <= 20 else 5
@@ -149,7 +168,7 @@ def build_svg(frames):
         colour = "#b8c4bd" if tick == 0 else "#e3e9e4"
         dash = '' if tick == 0 else ' stroke-dasharray="3 5"'
         parts.append(f'<line x1="126" y1="{y:.1f}" x2="1492" y2="{y:.1f}" stroke="{colour}"{dash}/>')
-        parts.append(text(110, y + 4, f"{tick}°", 11, "#7a8882", 450, "end"))
+        parts.append(text(110, y + 4, tick, 11, "#7a8882", 450, "end"))
 
     for day_index in range(7):
         start = day_index * 24
@@ -173,13 +192,6 @@ def build_svg(frames):
     parts.append(f'<g clip-path="url(#chartClip)"><path d="{" ".join(path_parts)}" fill="none" '
                  'stroke="#bd6548" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>')
 
-    peak_rows = []
-    for day_index in range(7):
-        day_frames = frames[day_index * 24:(day_index + 1) * 24]
-        available = [(day_index * 24 + i, f) for i, f in enumerate(day_frames) if f["delta"] is not None]
-        if available:
-            peak_index, peak = max(available, key=lambda pair: pair[1]["delta"])
-            peak_rows.append((peak_index, peak))
     for peak_index, peak in peak_rows:
         parts.append(f'<circle cx="{x_position(peak_index):.1f}" cy="{y_position(peak["delta"]):.1f}" '
                      'r="4.5" fill="#ffffff" stroke="#bd6548" stroke-width="2.5"/>')

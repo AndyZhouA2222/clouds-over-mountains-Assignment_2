@@ -11,10 +11,10 @@
 ## Visual system
 
 - **Palette:** Deep field black `#050a0a`, ice `#a6ffe5`, snow `#f2f5ef`, and the existing warm `#dda657`. The imagery supplies the rest of the color range.
-- **Typography:** Local Chinese serif display stack for scene titles; quiet system sans for body copy; monospace for dates and data.
+- **Typography:** Bodoni / Didot / Times display stack for English, local Chinese serif stack for Chinese, system sans for body copy, and monospace for dates and data.
 - **Composition:** An 8px spacing base with intentional scene-level asymmetry. Full image extents stay visible so map coverage remains comparable.
 - **Surfaces:** Sharp image and chart frames; no stack of generic cards. Scene contrast comes from the imagery and restrained overlays.
-- **Motion:** Short, one-time scroll reveals tied to scene arrival. Keep document scrolling native, provide a reduced-motion path, and retain every value in static reading order.
+- **Motion:** Native sticky scenes follow the nearest day as the reader scrolls. Loaded satellite images fade in over 260 ms; frequent value changes are immediate. Play/pause icons crossfade over 300 ms. Reduced motion disables nonessential animation.
 
 ## Contracts to preserve
 
@@ -24,6 +24,12 @@
 - Preserve the caveats: no synchronous overlay, no cloud-type classification, and no causal claim from temperature difference.
 - Retain the hourly controls, CTH frame controls, chart labels, keyboard operation, focus visibility, and source information.
 
-## V0 boundary
+## Implemented direction
 
-`storytelling-v0.html` is a visual direction draft. It uses the project's real imagery and existing summary plot, marks the CTH composition as a placeholder, and does not replace the production page.
+The user chose an immersive scroll story with a few real controls after reviewing the initial direction. `index.html` is now the production story: satellite opening, seven scrolling daily scenes, a light temperature chapter, a separate dark cloud-height chapter, and a closing interpretation. English is the first-visit default; the persistent EN / 中文 switch translates content, controls, chart labels, and accessibility descriptions without resetting the chosen observations.
+
+`storytelling-v0.html` remains an earlier direction draft. It is not the production entry point. The active stylesheet is `story.css`; older styles are retained but no longer loaded.
+
+## Delivery boundary
+
+The implementation uses the committed datasets and assets. The static site is assembled with `build_site.py`. Browser visual and interaction acceptance has not been performed in this environment.

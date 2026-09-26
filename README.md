@@ -1,6 +1,10 @@
 # Clouds over the Zugspitze
 
+**[Explore the interactive version →](#interactive-field-story)** · English / 中文 · Scroll through the satellite week, play hourly temperatures, and explore cloud-height scans.
+
 ![Seven NASA VIIRS daily cloud images and the hourly valley-to-summit temperature difference](out/plot.svg)
+
+**Finding · 14–20 September 2026:** The valley was warmer than the summit in all 168 observed hours: the hourly temperature gap ranged from **4.0 to 18.9 °C**, and daily peaks ranged from **15.7 to 18.9 °C**.
 
 ## The phenomenon
 
@@ -14,7 +18,27 @@ The two original hourly station archives are published by the [Deutscher Wetterd
 
 The seven upper panels are the downloaded NASA VIIRS daily composites, all covering the same map extent; the lower line is the hourly difference `valley temperature − summit temperature`, with one marker for each day's maximum. The chart keeps the paired station values and dates but does not show local terrain at station scale or the acquisition time of each satellite pixel. The stations are about 8 km apart, DWD's recent-data flag (`QN_9 = 1`) is a formal check rather than full quality control, and neither source identifies cumulonimbus or proves that temperature difference caused a cloud pattern.
 
-An interactive companion is available in `index.html`; its cloud-top-height layer is explicitly dated 22 September and is kept separate from the seven-day comparison. All analysis reads committed local files, so plotting works without network access.
+The [interactive companion](#interactive-field-story) keeps its cloud-top-height layer explicitly dated 22 September, separate from the seven-day temperature comparison. All analysis reads committed local files, so plotting works without network access.
+
+## Interactive field story
+
+### Open the experience
+
+1. Download this repository using **Code → Download ZIP** and extract it, or clone the repository.
+2. Open **[index.html](index.html)** from that local folder in a browser. Keep the `data/` and `assets/` folders and the page's scripts and stylesheet together.
+3. Use **EN / 中文** in the top navigation to switch languages. Scroll through the seven satellite scenes, then use the date buttons, hourly playback, and cloud-height slider to explore the observations.
+
+On GitHub, the `index.html` link opens the page's source. The steps above launch the interactive experience locally; it works without a server or network connection. The interface starts in English and remembers your language choice locally. All imagery, data, scripts, and styles are included; no package installation or remote font service is required.
+
+The hourly chart uses one continuous seven-day timeline. Cloud-height distributions use 500 m bins; the upper bin includes every value at or above 4,500 m. The white line identifies the median's bin, and brightness uses a shared scale across all thirteen frames.
+
+The main page uses `story.css`, `i18n.js`, and `app.js`. Earlier styles and `storytelling-v0.html` are retained as historical work and are not loaded by the production page. Native scrolling, keyboard controls, visible focus, and reduced-motion preferences are supported.
+
+To assemble the static website and its local assets into `site/`:
+
+```bash
+uv run build_site.py
+```
 
 ## Run it
 

@@ -1,74 +1,84 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Zugspitze / Cloud Field Study</title>
-  <meta name="description" content="楚格峰地区的七天 NASA VIIRS 云图与 DWD 山谷、山顶逐小时温差探索。">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='8' fill='%231b302e'/%3E%3Cpath d='M6 30 20 8l14 22M12 20l8 5 8-5' fill='none' stroke='%23f4bb63' stroke-width='2.5'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="field-theory.css">
+  <meta name="theme-color" content="#08110f">
+  <meta name="description" content="A journey through seven days of satellite imagery and alpine temperatures around Zugspitze, with a separate cloud-height study.">
+  <title>Clouds over mountains — A Zugspitze field study</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%2308110f'/%3E%3Cpath d='m5 29 10-14 6 8 5-12 9 18' fill='none' stroke='%23a6ffe5' stroke-width='2'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="story.css">
   <script defer src="data/observations.js"></script>
   <script defer src="data/clouds.js"></script>
+  <script defer src="i18n.js"></script>
   <script defer src="app.js"></script>
 </head>
 <body>
-  <header class="topbar">
-    <a class="brand" href="./"><span class="brand-mark" aria-hidden="true">∧</span><span>ZUGSPITZE <small>ATMOSPHERIC FIELD / 2026</small></span></a>
-    <div class="top-meta"><span>47.421° N</span><span>10.985° E</span><span class="top-meta-divider"></span><span>DWD × NASA GIBS</span></div>
-    <button class="source-button" id="about-button">数据来源 <span aria-hidden="true">↗</span></button>
+  <a class="skip-link" href="#temperature" data-i18n="skip">Skip to the observations</a>
+  <header class="masthead">
+    <a class="wordmark" href="#top" aria-label="Clouds over mountains — home"><svg viewBox="0 0 40 28" aria-hidden="true"><path d="m1 25 11-16 9 12 7-19 11 23M8 15l4 2 3-3M25 11l3 3 3-3"/></svg><span>CLOUD ATLAS<small>ZUGSPITZE / 2026</small></span></a>
+    <nav class="chapters" aria-label="Chapters" data-i18n-aria="chapters"><a href="#week"><span>01</span> <span data-i18n="navWeek">The week</span></a><a href="#temperature"><span>02</span> <span data-i18n="navTemp">The climb</span></a><a href="#clouds"><span>03</span> <span data-i18n="navCloud">The clouds</span></a></nav>
+    <div class="header-actions"><div class="language-switch" role="group" aria-label="Language"><button type="button" data-lang="en" aria-pressed="true" lang="en">EN</button><button type="button" data-lang="zh" aria-pressed="false" lang="zh-CN">中文</button></div><button class="source-trigger" id="about-button" data-i18n="sources">Sources</button></div>
+    <nav class="mobile-chapters" aria-label="Chapters" data-i18n-aria="chapters"><a href="#week"><span>01</span><span data-i18n="navWeek">The week</span></a><a href="#temperature"><span>02</span><span data-i18n="navTemp">The climb</span></a><a href="#clouds"><span>03</span><span data-i18n="navCloud">The clouds</span></a></nav>
   </header>
+  <main>
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="hero-image" aria-hidden="true"></div><div class="hero-wash" aria-hidden="true"></div>
+      <div class="hero-meta mono"><span data-i18n="heroMeta">AN ALPINE FIELD STUDY</span><span>47.421° N / 10.985° E</span></div>
+      <h1 id="hero-title"><span class="hero-word" data-i18n="heroWord">CLOUDS</span><span class="hero-line" data-i18n="heroLine">over mountains.</span></h1>
+      <div class="hero-bottom"><a class="enter-link" href="#week"><span class="arrow-circle" aria-hidden="true">↓</span><span data-i18n="enter">Follow the atmosphere</span></a><p data-i18n="heroDesc">Seven days. Two elevations. A shifting sky above the German Alps.</p><span class="hero-edition mono" data-i18n="heroDate">14—20 SEP<br>2026 / UTC</span></div>
+      <span class="hero-credit mono" data-i18n="heroCredit">NASA VIIRS · 20 SEP 2026 · DAILY COMPOSITE</span>
+    </section>
+    <noscript><p class="load-notice">Enable JavaScript to explore the observation controls and switch languages. The source datasets are available at the end of the page.</p></noscript>
+    <p id="data-error" class="load-notice" role="alert" hidden></p>
 
-  <main class="field-main">
-    <section class="field-stage" aria-labelledby="map-heading">
-      <div class="stage-heading">
-        <div class="stage-title"><p class="kicker">CLOUD FIELD / ZUGSPITZE</p><h1 id="map-heading">山谷升温时，云顶发生了什么？</h1><p>卫星影像与山地温差的七日观测</p></div>
-        <div class="stage-readout"><span class="readout-label">当前温差 ΔT</span><div><strong id="live-delta">—</strong><em>°C</em></div><small><span id="reading-time">12:00 UTC</span> · 山谷 − 山顶</small><small>本日峰值 <b id="delta-peak">—</b>°C · <span id="peak-time">UTC</span></small></div>
+    <section class="week-section" id="week" aria-labelledby="week-title">
+      <div class="chapter-heading"><p class="eyebrow"><span>01 /</span> <span data-i18n="weekEyebrow">WATCH THE LANDSCAPE</span></p><div class="chapter-intro"><h2 id="week-title" data-i18n="weekTitle">One place.<br>Seven passing skies.</h2><p data-i18n="weekIntro">Move through a week of real satellite images. Each scene is a daily composite; the temperatures come from hourly measurements on the ground.</p></div></div>
+      <div class="week-story">
+        <div class="sticky-scene">
+          <div class="scene-top mono"><span>SUOMI NPP / VIIRS</span><span id="scene-counter">01 / 07</span></div>
+          <div class="satellite-stage" id="viirs-panel">
+            <div class="map-world" id="map-world"><img id="map-image" src="data/raw/viirs-20260914.jpg" alt="NASA VIIRS daily composite of the Zugspitze region, 14 September 2026" width="1440" height="900" decoding="sync" draggable="false"><div id="map-markers" class="map-markers"></div></div>
+            <div class="map-corner mono"><span class="live-dot" aria-hidden="true"></span><span id="map-date">14 SEP 2026</span></div>
+            <div class="map-controls"><button id="zoom-out" type="button" aria-label="Zoom out" data-i18n-aria="zoomOut">−</button><button id="zoom-in" type="button" aria-label="Zoom in" data-i18n-aria="zoomIn">+</button><button id="reset-map" type="button" aria-label="Reset map extent" data-i18n-aria="reset">1:1</button></div>
+          </div>
+          <div class="image-feedback" id="map-feedback"><p id="map-status" role="status" aria-live="polite" aria-atomic="true" tabindex="-1"></p><button id="map-retry" type="button" hidden data-i18n="retryImage">Retry image</button></div>
+          <div class="scene-caption"><p><span class="mono">NASA GIBS</span> <span data-i18n="dailyNote">Daily composite · scroll to change the date</span></p><span class="mono" data-i18n="mapExtent">320 × 200 km projected extent</span></div>
+          <div class="scene-progress" aria-hidden="true"><span id="scene-progress"></span></div>
+        </div>
+        <div class="day-scenes" id="day-scenes"><article class="day-scene"><p class="eyebrow">14—20 SEP 2026</p><h3 data-i18n="weekFallback">A week in the atmosphere.</h3><p data-i18n="weekIntro">Move through a week of real satellite images.</p></article></div>
       </div>
-      <div class="map-frame" id="map-frame" aria-label="楚格峰区域卫星影像和云顶高度并列观测">
-        <section class="map-panel viirs-panel" id="viirs-panel" aria-label="NASA VIIRS 真彩色影像">
-          <div class="map-world" id="map-world"><img id="map-image" src="data/raw/viirs-20260920.jpg" alt="楚格峰区域真实 NASA VIIRS 真彩色卫星影像" draggable="false"><div id="map-markers"></div></div>
-          <div class="scene-shade" aria-hidden="true"></div>
-          <div class="panel-label"><span>OPTICAL / NASA VIIRS</span><strong id="map-date">09 / 20 / 2026</strong><small id="map-time">DAILY COMPOSITE</small></div>
-          <div class="scene-title-lockup"><span id="scene-index">FIELD 07 / 07</span><strong id="scene-date">20<span>SEP</span></strong><small>TRUE COLOR</small></div>
-          <div class="scene-data-rail"><span class="rail-label">DWD STATIONS</span><div><i class="rail-valley"></i><span>VALLEY <b id="valley-now">—</b>°C</span></div><div><i class="rail-summit"></i><span>SUMMIT <b id="summit-now">—</b>°C</span></div><small>719 m <b>↗</b> 2,956 m</small></div>
-          <div id="map-error" class="map-error" hidden>VIIRS 影像未能载入。</div>
-          <div class="stage-dates"><span>VIIRS DAILY / UTC</span><div id="day-strip" class="day-strip" aria-label="选择卫星影像日期"></div></div>
-        </section>
-        <section class="map-panel cth-panel" id="cth-panel" aria-label="DWD 云顶高度参考图">
-          <div class="map-world" id="cth-world"><img id="cth-image" class="terrain-image" src="assets/terrain-mercator.jpg" alt="楚格峰区域 Esri 地形参考底图，日期未知" draggable="false"><canvas id="cloud-canvas" width="1440" height="900" aria-hidden="true"></canvas><div id="cth-markers"></div></div>
-          <div class="scene-shade" aria-hidden="true"></div>
-          <div class="panel-label"><span>DWD FCI / CLOUD TOP HEIGHT</span><strong>22 / 09 / 2026</strong><small id="cth-map-time">06:08 UTC</small></div>
-          <div class="height-legend"><span>云顶高度 / km</span><div class="height-swatches"><i></i><i></i><i></i><i></i><i></i></div><div class="legend-values"><b>0.5</b><b>1.5</b><b>2.5</b><b>3.5</b><b>4.5+</b></div><small>透明 = 无有效云高值，不代表晴空</small></div>
-          <div class="cth-frame-readout"><span>区域中位数</span><strong id="cth-map-median">—</strong><small id="cth-map-valid">有效格点 — / 4356</small></div>
-          <div id="cth-map-error" class="map-error" hidden>CTH 参考底图未能载入。</div>
-          <div class="map-controls"><span class="north">N<svg viewBox="0 0 18 22" aria-hidden="true"><path d="m9 1 7 20-7-5-7 5Z"/></svg></span><button id="zoom-in" aria-label="同步放大两幅地图">+</button><button id="zoom-out" aria-label="同步缩小两幅地图">−</button><button id="reset-map" aria-label="恢复两幅地图范围">⌖</button></div>
-          <div class="cth-frame-control"><label class="sr-only" for="cth-slider">选择云顶高度观测帧</label><output id="cth-slider-time">06:08 UTC</output><input id="cth-slider" type="range" min="0" max="12" value="0"><span>13 FRAMES</span></div>
-        </section>
-      </div>
-      <div class="stage-controlbar">
-        <div class="hour-readout"><button id="play-button" aria-label="播放时间序列"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 9 6-9 6Z"/></svg></button><output id="selected-time">12:00 <small>UTC</small></output></div>
-        <div class="slider"><label class="sr-only" for="time-slider">选择小时</label><input id="time-slider" type="range" min="0" max="23" value="12"><div><span>00</span><span>06</span><span>12</span><span>18</span><span>23</span></div></div>
-        <div class="stage-time-meta"><span>DWD TEMPERATURE · UTC</span><strong id="selected-date">20 SEP</strong><small id="day-summary">24 个整点配对观测</small></div>
-      </div>
-      <div class="map-note"><span id="map-note">并列显示不同日期的 VIIRS 日合成与 DWD CTH 参考，不作同期叠加。</span><span id="map-bounds">EPSG:3857 · same extent</span></div>
-      <section class="cth-profile" aria-labelledby="cth-heading">
-        <div class="cth-heading"><span class="cth-tag">REFERENCE SCAN / 22 SEP</span><h2 id="cth-heading">云顶高度分布随时间变化</h2><p>纵轴 km，横轴 UTC；颜色表示高度区间，亮度表示有效格点中的相对占比，白线为区域中位数。</p></div>
-        <div class="cth-stat"><span>选定帧区域中位数</span><strong id="cth-median">—</strong><small id="cth-frame-label">--:08 UTC</small></div>
-        <svg id="cth-chart" role="slider" tabindex="0" aria-valuemin="0" aria-valuemax="12" aria-valuenow="0" aria-valuetext="06:08 UTC" aria-label="选择 2026 年 9 月 22 日云顶高度时间帧，按左右方向键逐帧调整；热图纵轴为公里，横轴为 UTC，白线为中位数"></svg>
-        <span class="cth-range-note" id="cth-range-note">有效格点比例与 P10–P90：—</span>
-      </section>
+      <a class="chapter-link" href="#temperature"><span data-i18n="weekNext">Now, move from the sky to the stations.</span><span aria-hidden="true">↘</span></a>
     </section>
 
-    <section class="analysis-card" aria-labelledby="analysis-heading">
-      <div class="analysis-head"><div><p class="kicker">THERMAL TRANSECT / 14—20 SEP</p><h2 id="analysis-heading">七天温差剖面</h2><p>两站海拔相差 2,237 m · 相距约 8 km</p></div><div class="chart-legend"><span><i class="legend-line daily-line"></i>每日峰值 ΔT</span><span><i class="legend-line selected-line"></i>选定日小时线</span></div></div>
-      <div class="chart-shell"><span class="axis-label axis-top">温差 / °C</span><svg id="analysis-chart" role="img" aria-label="七天温差峰值和选定日温差时间序列"></svg></div>
+    <section class="temperature-section" id="temperature" aria-labelledby="temperature-title">
+      <div class="chapter-heading"><p class="eyebrow"><span>02 /</span> <span data-i18n="tempEyebrow">FEEL THE DISTANCE</span></p><div class="chapter-intro"><h2 id="temperature-title" data-i18n="tempTitle">A short journey.<br>A different temperature.</h2><p data-i18n="tempIntro">About eight kilometres apart, the valley and summit stations sit 2,237 metres apart vertically. Explore the temperature difference, hour by hour.</p></div></div>
+      <div class="thermal-composition">
+        <div class="station-transect" aria-label="Station elevations" data-i18n-aria="elevations"><div class="station summit-station"><span class="station-dot"></span><div><p class="mono" data-i18n="summit">SUMMIT</p><h3>Zugspitze</h3><span>2,956 m</span></div><strong><span id="summit-now">—</span><small>°C</small></strong></div><div class="elevation-gap"><span>2,237 <small>m</small></span><p data-i18n="vertical">VERTICAL DISTANCE</p></div><div class="station valley-station"><span class="station-dot"></span><div><p class="mono" data-i18n="valley">VALLEY</p><h3>Garmisch</h3><span>719 m</span></div><strong><span id="valley-now">—</span><small>°C</small></strong></div></div>
+        <div class="delta-composition"><p class="eyebrow" data-i18n="difference">TEMPERATURE DIFFERENCE / ΔT</p><div class="delta-number"><span id="live-delta">—</span><span>°C</span></div><div class="delta-bottom"><span data-i18n="formula">Valley minus summit</span><span id="reading-stamp" class="mono">14 SEP / 12:00 UTC</span></div></div>
+      </div>
+      <div class="instrument">
+        <div class="weekly-finding"><p class="eyebrow" data-i18n="findingLabel">WHAT THE WEEK REVEALS / 14–20 SEP</p><p id="week-finding">In all 168 observed hours, the valley was warmer than the summit: the hourly gap was 4.0–18.9 °C, with daily peaks of 15.7–18.9 °C.</p></div>
+        <div class="instrument-heading"><span class="eyebrow" data-i18n="explore">EXPLORE THE OBSERVATIONS</span><span id="peak-note" class="mono"></span></div>
+        <div class="day-strip" id="day-strip" role="group" aria-label="Select observation date" data-i18n-aria="selectDay"></div>
+        <div class="hour-controls"><button class="play-button" id="play-button" type="button" aria-label="Play hourly observations" aria-pressed="false"><svg class="play-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 11 7-11 7Z"/></svg><svg class="pause-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg></button><output id="selected-time" for="time-slider" class="mono">12:00 UTC</output><div class="range-wrap"><label class="sr-only" for="time-slider" data-i18n="selectHour">Select hour</label><input id="time-slider" type="range" min="0" max="23" step="1" value="12"><div class="range-ticks mono" aria-hidden="true"><span>00</span><span>06</span><span>12</span><span>18</span><span>23</span></div></div></div>
+        <div class="chart-caption"><span data-i18n="chartTitle">The whole week, one continuous timeline.</span><span><i class="legend-stroke"></i><span data-i18n="chartLegend">Hourly ΔT</span> <i class="legend-dot"></i><span data-i18n="peakLegend">Daily peak</span></span></div>
+        <svg id="analysis-chart" role="img" aria-label="Hourly valley-minus-summit temperature difference over seven days; vertical axis ΔT in degrees Celsius" aria-describedby="week-finding" data-i18n-aria="chartAria"></svg>
+        <p class="instrument-note" data-i18n="instrumentNote">168 paired observations · UTC · °C · Selected day shaded. The satellite image is a daily composite and does not change with the hour.</p>
+      </div>
     </section>
 
-    <section class="reading-note"><span class="note-number">INTERPRETATION LIMIT</span><p>VIIRS 为 9 月 14–20 日真彩色日合成；DWD CTH 仅有 9 月 22 日 13 帧参考。日期不同，不作同期叠加。温差和云顶高度都不能单独证明积雨云。</p><a href="data/observations.json" download>观测数据 ↓</a><a href="data/clouds.json" download>CTH 格网 ↓</a></section>
-    <footer><span>ZUGSPITZE / CLOUD FIELD STUDY</span><span>DWD · NASA GIBS · Esri <i>·</i> 本地静态原型</span></footer>
+    <section class="cloud-section" id="clouds" aria-labelledby="cloud-title">
+      <div class="chapter-heading"><p class="eyebrow"><span>03 /</span> <span data-i18n="cloudEyebrow">LOOK A LITTLE HIGHER</span></p><div class="chapter-intro"><h2 id="cloud-title" data-i18n="cloudTitle">A different day.<br>Another layer.</h2><div><p data-i18n="cloudIntro">On 22 September, thirteen satellite scans reveal the height of the cloud tops. Move through the frames to see how the distribution changes.</p><p class="date-note" data-i18n="dateNote">22 SEP 2026 — a separate observation day from the temperature study.</p></div></div></div>
+      <div class="cloud-composition"><div class="cloud-map-column"><div class="scene-top mono"><span data-i18n="cloudSource">DWD / FCI / CLOUD TOP HEIGHT</span><span id="cth-frame-count">01 / 13</span></div><div class="satellite-stage cth-stage"><div class="map-world" id="cth-world"><img id="cth-image" src="assets/terrain-mercator.jpg" alt="Esri World Imagery reference terrain, imagery date unknown" data-i18n-alt="terrainAlt" width="1440" height="900" loading="lazy" draggable="false"><canvas id="cloud-canvas" width="1440" height="900" aria-hidden="true"></canvas><div id="cth-markers" class="map-markers"></div></div><div class="map-corner mono"><span data-i18n="cloudDate">22 SEP 2026</span><span id="cth-map-time">06:08 UTC</span></div></div><div class="image-feedback" id="terrain-feedback"><p id="terrain-status" role="status" aria-live="polite" aria-atomic="true" tabindex="-1"></p><button id="terrain-retry" type="button" hidden data-i18n="retryTerrain">Retry terrain</button></div><div class="height-legend"><span data-i18n="heightLegend">Cloud top / km</span><div><span style="--swatch:#4880ad">0–1.5</span><span style="--swatch:#33b8b5">1.5–2.5</span><span style="--swatch:#7dd89a">2.5–3.5</span><span style="--swatch:#efc65b">3.5–4.5</span><span style="--swatch:#f3845e">4.5+</span></div></div><p class="map-disclaimer" data-i18n="transparent">Transparent means no valid cloud-height value, not necessarily clear sky.</p><p class="attribution">Source: Esri, Vantor, Earthstar Geographics, and the GIS User Community</p></div>
+      <aside class="cloud-readout"><p class="eyebrow" data-i18n="regionalMedian">REGIONAL MEDIAN</p><div class="cloud-number"><strong id="cth-median">—</strong><span>km</span></div><p data-i18n="medianExplanation">The middle height among valid cloud grid cells in this frame.</p><dl><div><dt data-i18n="middle80">P10–P90</dt><dd id="cth-range">—</dd></div><div><dt data-i18n="validCells">Valid grid cells</dt><dd id="cth-valid">—</dd></div><div><dt data-i18n="observation">Observed at</dt><dd id="cth-observed">—</dd></div></dl></aside></div>
+      <div class="cth-controls"><div><label for="cth-slider" data-i18n="selectCloud">Move through the cloud scans</label><output id="cth-slider-time" for="cth-slider" class="mono">06:08 UTC</output></div><input id="cth-slider" type="range" min="0" max="12" step="1" value="0"><div class="range-ticks mono" aria-hidden="true"><span>06:08</span><span>09:08</span><span>12:08</span><span>15:08</span><span>18:08 UTC</span></div></div>
+      <div class="distribution"><div class="distribution-heading"><h3 data-i18n="distributionTitle">The shape of the clouds.</h3><p data-i18n="distributionNote">Each column is a scan. Brighter cells contain a larger share of valid heights; the white line follows the median height band. The top band includes all heights ≥ 4.5 km.</p></div><div class="distribution-chart"><span class="mono axis-caption">km</span><svg id="cth-chart" role="slider" tabindex="0" aria-label="Select cloud scan" aria-valuemin="0" aria-valuemax="12" aria-valuenow="0" data-i18n-aria="cthChartAria"></svg><p class="instrument-note" data-i18n="distributionScale">Brightness uses the same scale across all frames. Select a column or use the arrow keys to explore.</p></div></div>
+    </section>
+
+    <section class="closing" aria-labelledby="closing-title"><p class="eyebrow" data-i18n="closingEyebrow">THE VIEW FROM HERE</p><h2 id="closing-title" data-i18n="closingTitle">A changing sky.<br>An open question.</h2><p class="closing-copy" data-i18n="closingCopy">Temperature tells one part of the story. Cloud height tells another. These observations invite a closer look, but their different dates cannot establish a relationship between the two.</p><div class="closing-links"><a href="data/observations.json" download><span data-i18n="downloadTemp">Temperature data</span><span aria-hidden="true">↓</span></a><a href="data/clouds.json" download><span data-i18n="downloadCloud">Cloud-height grid</span><span aria-hidden="true">↓</span></a><a href="#top"><span data-i18n="backTop">Return to the sky</span><span aria-hidden="true">↑</span></a></div><p class="closing-note" data-i18n="closingNote">An exploratory field study. Neither temperature difference nor cloud height alone identifies cumulonimbus clouds.</p></section>
   </main>
-
-<dialog id="data-dialog"><div class="dialog-head"><div><p class="kicker">PROVENANCE</p><h2>数据从哪里来</h2></div><button id="close-dialog" aria-label="关闭数据来源">×</button></div><div class="dialog-body"><section><b>01</b><div><h3>DWD 小时气温</h3><p>01550 Garmisch-Partenkirchen（719 m）与 05792 Zugspitze（2,956 m），2026-09-14 至 20，共 336 条小时记录，168 组配对。原始时间为 UTC，单位 °C，缺测不插补。</p><a href="https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/" target="_blank" rel="noreferrer">打开 DWD 目录 ↗</a></div></section><section><b>02</b><div><h3>DWD 云顶高度</h3><p>2026-09-22 的 13 帧 CTH NetCDF 产品，CF 时间为 06:08–18:08 UTC，44×99 格网，单位 m。显示有效正云高和 opacity 格点；透明不等于晴空。</p><a href="https://opendata.dwd.de/weather/satellite/clouds/CTH/" target="_blank" rel="noreferrer">打开 DWD CTH 目录 ↗</a></div></section><section><b>03</b><div><h3>NASA VIIRS 与地形</h3><p>14–20 日 Suomi NPP / VIIRS 真彩色日合成影像。地形参考为 Esri World Imagery 拼接底图，日期未知。两种底图都保持 1440×900 EPSG:3857 比例。</p><p class="attribution">Source: NASA GIBS · Source: Esri, Vantor, Earthstar Geographics, and the GIS User Community</p></div></section><section><b>04</b><div><h3>研究边界</h3><p>本页面没有积雨云分类、DEM 遮挡、太阳方位、相机俯仰角或安全建议。云图和温差用于探索，不构成天气预报或最佳拍摄保证。</p></div></section></div></dialog>
+  <footer><a class="footer-brand" href="#top">CLOUD ATLAS<span> / ZUGSPITZE</span></a><span class="mono">DWD · NASA GIBS · 2026</span><span data-i18n="footer">Look closely. Keep asking.</span></footer>
+  <dialog id="data-dialog" aria-labelledby="sources-title"><div class="dialog-heading"><div><p class="eyebrow" data-i18n="provenance">PROVENANCE & CONTEXT</p><h2 id="sources-title" data-i18n="sourcesTitle">Behind the observations.</h2></div><button id="close-dialog" type="button" aria-label="Close sources" data-i18n-aria="close">×</button></div><div class="dialog-body"><section><span class="mono">01</span><div><h3 data-i18n="sourceTempTitle">Ground / DWD temperature</h3><p data-i18n="sourceTemp">Stations 01550 Garmisch-Partenkirchen (719 m) and 05792 Zugspitze (2,956 m). 14–20 September 2026: 336 hourly station records, 168 pairs. UTC, °C; missing values are not interpolated. Recent observations have QN9=1: formal checking, not complete quality control.</p><a href="https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/" target="_blank" rel="noreferrer">DWD CDC ↗</a></div></section><section><span class="mono">02</span><div><h3 data-i18n="sourceCloudTitle">Sky / DWD cloud top height</h3><p data-i18n="sourceCloud">22 September 2026, 13 frames from 06:08 to 18:08 UTC. Variable cloud_top_height_FCI_IR10.5, in metres; 44 × 99 grid cells. Only positive height and opacity values are displayed. This is a separate date from the seven-day temperature study.</p><a href="https://opendata.dwd.de/weather/satellite/clouds/CTH/" target="_blank" rel="noreferrer">DWD CTH ↗</a></div></section><section><span class="mono">03</span><div><h3 data-i18n="sourceImageTitle">Landscape / NASA & Esri</h3><p data-i18n="sourceImage">Suomi NPP / VIIRS true-colour daily composites, 14–20 September 2026, via NASA GIBS. Reference terrain: Esri World Imagery, acquisition date unknown. Maps preserve the same 1440 × 900 EPSG:3857 extent at their default zoom.</p><p class="attribution">Source: NASA GIBS. Source: Esri, Vantor, Earthstar Geographics, and the GIS User Community.</p></div></section><section><span class="mono">04</span><div><h3 data-i18n="sourceLimitTitle">What these observations can tell us</h3><p data-i18n="sourceLimit">The page does not classify cloud types or establish causality. It is an exploratory study, not a weather forecast or a guarantee of photography conditions. The two stations sample different locations and elevations.</p></div></section></div></dialog>
 </body>
 </html>

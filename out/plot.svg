@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1600" height="1080" viewBox="0 0 1600 1080" role="img" aria-labelledby="title description">
 <title id="title">Clouds over the Zugspitze, 14 to 20 September 2026</title>
-<desc id="description">Seven NASA VIIRS daily satellite composites above a chart of 168 hourly temperature differences between Garmisch-Partenkirchen and Zugspitze.</desc>
+<desc id="description">Seven NASA VIIRS daily satellite composites above a chart of hourly temperature differences between Garmisch-Partenkirchen and Zugspitze. The valley was warmer in all 168 observed hours. Hourly gap: 4.0–18.9 °C; daily peaks: 15.7–18.9 °C. ΔT = valley − summit.</desc>
 <defs><linearGradient id="paper" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f7f8f4"/><stop offset="1" stop-color="#eef2ed"/></linearGradient>
 <clipPath id="chartClip"><rect x="126" y="552" width="1366" height="348"/></clipPath>
 <clipPath id="tile0"><rect x="0" y="0" width="198" height="124" rx="5"/></clipPath>
@@ -42,23 +42,24 @@
 </g>
 <line x1="80" y1="402" x2="1520" y2="402" stroke="#e3e8e2"/>
 <text x="80.0" y="448.0" font-size="12" fill="#31413d" font-weight="700" text-anchor="start" letter-spacing="1.1">02  /  TEMPERATURE CONTRAST</text>
-<text x="80.0" y="478.0" font-size="24" fill="#203330" font-weight="600" text-anchor="start" >Valley minus summit</text>
-<text x="80.0" y="504.0" font-size="13" fill="#71807b" font-weight="400" text-anchor="start" >Hourly air temperature difference  ·  ΔT = Garmisch-Partenkirchen − Zugspitze</text>
+<text x="80.0" y="478.0" font-size="24" fill="#203330" font-weight="600" text-anchor="start" >The valley was warmer in all 168 observed hours</text>
+<text x="80.0" y="504.0" font-size="14" fill="#51615b" font-weight="400" text-anchor="start" >Hourly gap: 4.0–18.9 °C; daily peaks: 15.7–18.9 °C. ΔT = valley − summit.</text>
 <line x1="1190" y1="474" x2="1222" y2="474" stroke="#bd6548" stroke-width="3" stroke-linecap="round"/>
 <text x="1232.0" y="479.0" font-size="12" fill="#52615b" font-weight="550" text-anchor="start" >hourly ΔT</text>
 <circle cx="1373" cy="474" r="4.5" fill="#ffffff" stroke="#bd6548" stroke-width="2.5"/>
 <text x="1386.0" y="479.0" font-size="12" fill="#52615b" font-weight="550" text-anchor="start" >daily maximum</text>
 <rect x="126" y="552" width="1366" height="348" fill="#fbfcfa" stroke="#e7ece7"/>
+<text x="126.0" y="538.0" font-size="13" fill="#31413d" font-weight="600" text-anchor="start" >ΔT (°C)</text>
 <line x1="126" y1="900.0" x2="1492" y2="900.0" stroke="#b8c4bd"/>
-<text x="110.0" y="904.0" font-size="11" fill="#7a8882" font-weight="450" text-anchor="end" >0°</text>
+<text x="110.0" y="904.0" font-size="11" fill="#7a8882" font-weight="450" text-anchor="end" >0</text>
 <line x1="126" y1="820.9" x2="1492" y2="820.9" stroke="#e3e9e4" stroke-dasharray="3 5"/>
-<text x="110.0" y="824.9" font-size="11" fill="#7a8882" font-weight="450" text-anchor="end" >5°</text>
+<text x="110.0" y="824.9" font-size="11" fill="#7a8882" font-weight="450" text-anchor="end" >5</text>
 <line x1="126" y1="741.8" x2="1492" y2="741.8" stroke="#e3e9e4" stroke-dasharray="3 5"/>
-<text x="110.0" y="745.8" font-size="11" fill="#7a8882" font-weight="450" text-anchor="end" >10°</text>
+<text x="110.0" y="745.8" font-size="11" fill="#7a8882" font-weight="450" text-anchor="end" >10</text>
 <line x1="126" y1="662.7" x2="1492" y2="662.7" stroke="#e3e9e4" stroke-dasharray="3 5"/>
-<text x="110.0" y="666.7" font-size="11" fill="#7a8882" font-weight="450" text-anchor="end" >15°</text>
+<text x="110.0" y="666.7" font-size="11" fill="#7a8882" font-weight="450" text-anchor="end" >15</text>
 <line x1="126" y1="583.6" x2="1492" y2="583.6" stroke="#e3e9e4" stroke-dasharray="3 5"/>
-<text x="110.0" y="587.6" font-size="11" fill="#7a8882" font-weight="450" text-anchor="end" >20°</text>
+<text x="110.0" y="587.6" font-size="11" fill="#7a8882" font-weight="450" text-anchor="end" >20</text>
 <text x="220.1" y="930.0" font-size="11" fill="#687771" font-weight="650" text-anchor="middle" >SEP 14</text>
 <line x1="322.3" y1="552" x2="322.3" y2="900" stroke="#d5ddd7" stroke-dasharray="2 6"/>
 <text x="416.4" y="930.0" font-size="11" fill="#687771" font-weight="650" text-anchor="middle" >SEP 15</text>
