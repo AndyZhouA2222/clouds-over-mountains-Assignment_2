@@ -14,7 +14,7 @@ import shutil
 
 ROOT = Path(__file__).resolve().parent
 SITE = ROOT / "site"
-PAGE_FILES = ("index.html", "app.js", "i18n.js", "story.css")
+PAGE_FILES = ("index.html", "app.js", "i18n.js", "motion.js", "story.css")
 DATA_FILES = (
     "observations.js", "observations.json", "clouds.js", "clouds.json",
 )
@@ -36,6 +36,7 @@ def main():
     required.extend(f"data/{name}" for name in DATA_FILES)
     required.extend(day["image"] for day in observations["days"])
     required.append(observations["map"]["terrain"])
+    required.extend(("assets/hero-mountains.jpg", "assets/hero-source.json"))
 
     for relative_path in required:
         copy_file(relative_path)

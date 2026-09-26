@@ -3,10 +3,15 @@ window.CLOUD_ATLAS_I18N = (() => {
   const zh = {
     skip:'跳至观测数据', chapters:'章节导航', navWeek:'七日天空', navTemp:'从谷到峰', navCloud:'云层之上', sources:'数据来源',
     heroMeta:'阿尔卑斯山地观测', heroWord:'山上有云', heroLine:'云下是山。', enter:'循着天空，向下探索', heroDate:'9 月 14—20 日<br>2026 / UTC',
-    heroDesc:'七天，两处海拔。一片不断变化的阿尔卑斯天空。', heroCredit:'NASA VIIRS · 2026 年 9 月 20 日 · 真彩色日合成',
+    heroDesc:'七天，两处海拔。一片不断变化的阿尔卑斯天空。', heroCredit:'摄影：GABRIEL GARCIA MARENGO / UNSPLASH · 山地景观配图 ↗',
     weekEyebrow:'凝视这片山地', weekTitle:'同一片山。<br>七日流动的天空。',
     weekIntro:'随滚动翻阅一周的真实卫星影像。每幅图都是当日合成；地面的温度则来自两座气象站的逐小时观测。',
     dailyNote:'真彩色日合成 · 滚动切换日期', mapExtent:'320 × 200 km 投影范围', weekFallback:'天空中的七日。',
+    mapPeakLabel:'当日最大 ΔT', mapGroundTime:'DWD · {time} UTC',
+    mapGroundNote:'卫星图为当日合成；两站气温取当天最大温差时刻。',
+    locateValley:'在地图上定位 Garmisch 山谷站', locateSummit:'在地图上定位 Zugspitze 山顶站',
+    stationHint:'点击站点气温，在地图上定位；再次点击可取消。',
+    mapGroundSummary:'{date}，{time} UTC：山谷 {valley} °C，山顶 {summit} °C；当日最大温差 {delta} °C。',
     zoomOut:'缩小卫星地图', zoomIn:'放大卫星地图', reset:'恢复完整地图范围', imageError:'这幅卫星影像暂时无法载入。',
     imageLoading:'正在载入 {date} 的影像…', imageLoadError:'{date} 的影像未能载入。', imageReady:'当前影像：{date}',
     retryImage:'重试影像', retryTerrain:'重试底图', retrying:'正在重试…',
@@ -51,6 +56,8 @@ window.CLOUD_ATLAS_I18N = (() => {
     cloudError:'云顶高度数据未能载入。气温观测仍可使用。', month:'9月', chartDay:'日'
   };
   const en = {
+    mapGroundTime:'DWD · {time} UTC',
+    mapGroundSummary:'{date}, {time} UTC: valley {valley} °C, summit {summit} °C; daily maximum difference {delta} °C.',
     imageLoading:'Loading the image for {date}…', imageLoadError:'The image for {date} could not be loaded.', imageReady:'Showing {date}',
     retryImage:'Retry image', retryTerrain:'Retry terrain', retrying:'Retrying…',
     terrainLoading:'Loading the reference terrain…', terrainReady:'Reference terrain · imagery date unknown',

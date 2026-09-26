@@ -4,7 +4,7 @@
   const i18n = window.CLOUD_ATLAS_I18N;
   const data = window.CLOUD_ATLAS_DATA;
   const cth = window.CLOUD_ATLAS_CTH;
-  const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const effects = window.CLOUD_ATLAS_MOTION;
   const clamp = (n,low,high) => Math.max(low,Math.min(high,n));
   const valid = value => Number.isFinite(value);
   const number = (value, digits = 1) => valid(value) ? value.toFixed(digits) : '—';
@@ -15,7 +15,6 @@
   let scrollPending = false;
   let imageRequest = 0;
   let terrainRequest = 0;
-  let imageAnimation = null;
   let sceneElements = [];
   let chartGeometry = null;
   i18n.init();
@@ -25,11 +24,16 @@
   i18n.set(savedLanguage);
 
   const dialog = $('data-dialog');
-  $('about-button').addEventListener('click', () => { stopPlayback(); dialog.showModal(); });
-  $('close-dialog').addEventListener('click', () => dialog.close());
+  $('about-button').addEventListener('click', () => { stopPlayback(); dialog.showModal(); effects?.dialogOpened(dialog); });
+  function closeSources() {
+    if (effects) effects.closeDialog(dialog);
+    else dialog.close();
+  }
+  $('close-dialog').addEventListener('click',closeSources);
+  dialog.addEventListener('cancel',event => { event.preventDefault(); closeSources(); });
   dialog.addEventListener('click', event => {
     const rect = dialog.getBoundingClientRect();
-    if (event.target === dialog && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)) dialog.close();
+    if (event.target === dialog && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)) closeSources();
   });
   document.querySelectorAll('[data-lang]').forEach(button => button.addEventListener('click', () => {
     i18n.set(button.dataset.lang);
@@ -73,6 +77,7 @@
     document.querySelectorAll('[data-day]').forEach(button => button.addEventListener('click', () => {
       stopPlayback();
       selectDay(Number(button.dataset.day));
+      effects?.readingChanged();
     }));
   }
   function translateScenes() {
@@ -97,6 +102,18 @@
     $('map-markers').innerHTML = html;
     $('cth-markers').innerHTML = html;
   }
+  function renderMapReadings() {
+    // Use the displayed image's day, so a pending request cannot mix dates.
+    const peak = peaks[state.displayedDay];
+    $('map-valley-temperature').textContent = number(peak?.valley);
+    $('map-summit-temperature').textContent = number(peak?.summit);
+    $('map-peak-delta').textContent = number(peak?.delta);
+    $('map-ground-time').textContent = peak ? t('mapGroundTime',{time:time(peak.hour)}) : t('unavailable');
+    $('map-ground-summary').textContent = peak ? t('mapGroundSummary',{
+      date:i18n.date(data.days[state.displayedDay].date,true),time:time(peak.hour),
+      valley:number(peak.valley),summit:number(peak.summit),delta:number(peak.delta)
+    }) : t('unavailable');
+  }
   function updateMapText() {
     // The image caption always describes the image that has actually arrived.
     const day = data.days[state.displayedDay];
@@ -106,6 +123,7 @@
     $('scene-progress').style.width = ((state.displayedDay+1)/data.days.length*100) + '%';
     sceneElements.forEach((scene,index) => scene.classList.toggle('is-current',index === state.day));
     document.querySelectorAll('[data-day]').forEach(button => button.setAttribute('aria-pressed',String(Number(button.dataset.day) === state.day)));
+    renderMapReadings();
     renderMapStatus();
   }
   function renderImageFeedback(prefix,status,message) {
@@ -150,10 +168,7 @@
       state.displayedDay = day;
       state.mapStatus = 'ready';
       updateMapText();
-      if (changed && !motion.matches && $('map-image').animate) {
-        imageAnimation?.cancel();
-        imageAnimation = $('map-image').animate([{opacity:.55},{opacity:1}],{duration:260,easing:'cubic-bezier(.2,0,0,1)'});
-      }
+      if (changed) effects?.sceneChanged();
     };
     pending.onerror = () => {
       if (request !== imageRequest) return;
@@ -399,17 +414,21 @@
     }
   }
   $('time-slider').addEventListener('input',event => { stopPlayback(); state.hour = Number(event.target.value); renderReadings(); renderTemperatureChart(); });
+  $('time-slider').addEventListener('change',() => effects?.readingChanged());
   $('play-button').addEventListener('click',togglePlayback);
   $('zoom-in').addEventListener('click',() => setZoom(state.zoom+.25));
   $('zoom-out').addEventListener('click',() => setZoom(state.zoom-.25));
   $('reset-map').addEventListener('click',() => setZoom(1));
   // Normal wheel and touch scrolling always belong to the document.
   $('cth-slider').addEventListener('input',event => selectCloud(Number(event.target.value)));
+  $('cth-slider').addEventListener('change',() => effects?.cloudChanged());
   $('cth-chart').addEventListener('click',event => {
     if (!chartGeometry) return;
+    const previousX = Number($('cth-chart').querySelector('.cth-cursor')?.getAttribute('x'));
     const rect = $('cth-chart').getBoundingClientRect();
     const px = (event.clientX-rect.left)/rect.width*chartGeometry.width;
     selectCloud(Math.floor((px-chartGeometry.left)/chartGeometry.cellWidth));
+    effects?.cloudChanged(previousX);
   });
   $('cth-chart').addEventListener('keydown',event => {
     const moves = {ArrowLeft:-1,ArrowDown:-1,ArrowRight:1,ArrowUp:1,PageDown:-3,PageUp:3};
@@ -445,7 +464,6 @@
     resizePending = true;
     requestAnimationFrame(() => { resizePending = false; renderTemperatureChart(); renderCloudChart(); syncScroll(); });
   },{passive:true});
-  motion.addEventListener('change',() => { if (motion.matches) imageAnimation?.cancel(); });
   createScenes(); renderMarkers(); setZoom(1); renderLanguage(); loadMap();
   if (hasClouds) drawClouds();
   else {
@@ -454,4 +472,5 @@
     $('cth-chart').removeAttribute('tabindex');
   }
   requestAnimationFrame(syncScroll);
+  effects?.init();
 })();

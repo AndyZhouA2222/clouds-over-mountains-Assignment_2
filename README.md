@@ -32,7 +32,13 @@ On GitHub, the `index.html` link opens the page's source. The steps above launch
 
 The hourly chart uses one continuous seven-day timeline. Cloud-height distributions use 500 m bins; the upper bin includes every value at or above 4,500 m. The white line identifies the median's bin, and brightness uses a shared scale across all thirteen frames.
 
-The main page uses `story.css`, `i18n.js`, and `app.js`. Earlier styles and `storytelling-v0.html` are retained as historical work and are not loaded by the production page. Native scrolling, keyboard controls, visible focus, and reduced-motion preferences are supported.
+Chapter 01 places the two station temperatures and the daily maximum ΔT directly on each satellite scene, with the UTC hour of that maximum. The temperature values follow the loaded image's date. The satellite layer remains a daily composite, rather than a snapshot at that hour.
+
+The station readings also locate their corresponding map markers: hover or keyboard-focus a reading for a preview, and select it to pin the highlight. Select it again, or press Escape while focused, to clear the selection. The navigation underlines show progress through each chapter, the elevation line draws upward with scrolling, and clicking a cloud-chart column moves its selection outline into place. Slider dragging continues to update without interpolation.
+
+The opening landscape photograph is by [Gabriel Garcia Marengo on Unsplash](https://unsplash.com/photos/snow-capped-mountain-with-sea-of-clouds-qJvpykJ5SKs), used under the [Unsplash License](https://unsplash.com/license). It is an illustrative landscape, not part of the September 2026 observations. The local 3840-pixel image and its source record are included in `assets/`.
+
+The main page uses `story.css`, `i18n.js`, `app.js`, and `motion.js`. Earlier styles and `storytelling-v0.html` are retained as historical work and are not loaded by the production page. Native scrolling, keyboard controls, visible focus, and reduced-motion preferences are supported. The motion layer adds one-time chapter entrances, a reading-progress line, image reveals, smooth map zoom, and source-dialog transitions. Values update immediately; there are no animated intermediate measurements. Reduced-motion preferences cancel active animations and remove the decorative movement.
 
 To assemble the static website and its local assets into `site/`:
 

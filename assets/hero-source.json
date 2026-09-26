@@ -1,0 +1,17 @@
+{
+  "title": "Snow-capped mountain with sea of clouds",
+  "photographer": "Gabriel Garcia Marengo",
+  "provider": "Unsplash",
+  "page": "https://unsplash.com/photos/snow-capped-mountain-with-sea-of-clouds-qJvpykJ5SKs",
+  "downloadUrl": "https://images.unsplash.com/photo-1507039915464-9d829b6d2d78?fm=jpg&q=92&w=3840&fit=max",
+  "license": "Unsplash License",
+  "licenseUrl": "https://unsplash.com/license",
+  "file": "assets/hero-mountains.jpg",
+  "width": 3840,
+  "height": 2563,
+  "bytes": 1499128,
+  "sha256": "8b9f3b3349ec3d9d9ac081535b9c3fa2966c994c55716babbb8f48ad8ef59a63",
+  "retrievedUtc": "2026-09-26T11:00:42.448992+00:00",
+  "usage": "Illustrative opening landscape; not a September 2026 observation and not geolocated to the study stations.",
+  "creditEvidence": "Unsplash image-search listing; direct photograph page returned a bot challenge during source lookup."
+}

@@ -8,9 +8,11 @@
   <title>Clouds over mountains — A Zugspitze field study</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%2308110f'/%3E%3Cpath d='m5 29 10-14 6 8 5-12 9 18' fill='none' stroke='%23a6ffe5' stroke-width='2'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="story.css">
+  <link rel="preload" as="image" href="assets/hero-mountains.jpg" fetchpriority="high">
   <script defer src="data/observations.js"></script>
   <script defer src="data/clouds.js"></script>
   <script defer src="i18n.js"></script>
+  <script defer src="motion.js"></script>
   <script defer src="app.js"></script>
 </head>
 <body>
@@ -27,7 +29,7 @@
       <div class="hero-meta mono"><span data-i18n="heroMeta">AN ALPINE FIELD STUDY</span><span>47.421° N / 10.985° E</span></div>
       <h1 id="hero-title"><span class="hero-word" data-i18n="heroWord">CLOUDS</span><span class="hero-line" data-i18n="heroLine">over mountains.</span></h1>
       <div class="hero-bottom"><a class="enter-link" href="#week"><span class="arrow-circle" aria-hidden="true">↓</span><span data-i18n="enter">Follow the atmosphere</span></a><p data-i18n="heroDesc">Seven days. Two elevations. A shifting sky above the German Alps.</p><span class="hero-edition mono" data-i18n="heroDate">14—20 SEP<br>2026 / UTC</span></div>
-      <span class="hero-credit mono" data-i18n="heroCredit">NASA VIIRS · 20 SEP 2026 · DAILY COMPOSITE</span>
+      <a class="hero-credit mono" href="https://unsplash.com/photos/snow-capped-mountain-with-sea-of-clouds-qJvpykJ5SKs" target="_blank" rel="noreferrer" data-i18n="heroCredit">PHOTO: GABRIEL GARCIA MARENGO / UNSPLASH · ILLUSTRATIVE LANDSCAPE ↗</a>
     </section>
     <noscript><p class="load-notice">Enable JavaScript to explore the observation controls and switch languages. The source datasets are available at the end of the page.</p></noscript>
     <p id="data-error" class="load-notice" role="alert" hidden></p>
@@ -37,13 +39,21 @@
       <div class="week-story">
         <div class="sticky-scene">
           <div class="scene-top mono"><span>SUOMI NPP / VIIRS</span><span id="scene-counter">01 / 07</span></div>
-          <div class="satellite-stage" id="viirs-panel">
+          <div class="satellite-stage" id="viirs-panel" aria-describedby="map-ground-summary map-ground-note">
             <div class="map-world" id="map-world"><img id="map-image" src="data/raw/viirs-20260914.jpg" alt="NASA VIIRS daily composite of the Zugspitze region, 14 September 2026" width="1440" height="900" decoding="sync" draggable="false"><div id="map-markers" class="map-markers"></div></div>
             <div class="map-corner mono"><span class="live-dot" aria-hidden="true"></span><span id="map-date">14 SEP 2026</span></div>
-            <div class="map-controls"><button id="zoom-out" type="button" aria-label="Zoom out" data-i18n-aria="zoomOut">−</button><button id="zoom-in" type="button" aria-label="Zoom in" data-i18n-aria="zoomIn">+</button><button id="reset-map" type="button" aria-label="Reset map extent" data-i18n-aria="reset">1:1</button></div>
+            <p class="map-ground-time mono" id="map-ground-time"></p>
+            <div class="map-data-overlay">
+              <div class="map-metric valley-metric"><p><span class="metric-dot" aria-hidden="true"></span>Garmisch <small>719 m</small></p><strong><span id="map-valley-temperature">—</span><small> °C</small></strong><button class="metric-hotspot" type="button" data-map-station="valley" aria-controls="map-markers" aria-pressed="false" aria-label="Locate Garmisch on the map" data-i18n-aria="locateValley" disabled></button></div>
+              <div class="map-metric summit-metric"><p><span class="metric-dot" aria-hidden="true"></span>Zugspitze <small>2,956 m</small></p><strong><span id="map-summit-temperature">—</span><small> °C</small></strong><button class="metric-hotspot" type="button" data-map-station="summit" aria-controls="map-markers" aria-pressed="false" aria-label="Locate Zugspitze on the map" data-i18n-aria="locateSummit" disabled></button></div>
+              <div class="map-metric gap-metric"><p data-i18n="mapPeakLabel">DAILY MAX ΔT</p><strong><span id="map-peak-delta">—</span><small> °C</small></strong></div>
+            </div>
           </div>
-          <div class="image-feedback" id="map-feedback"><p id="map-status" role="status" aria-live="polite" aria-atomic="true" tabindex="-1"></p><button id="map-retry" type="button" hidden data-i18n="retryImage">Retry image</button></div>
+          <p id="map-ground-summary" class="sr-only"></p>
+          <div class="image-feedback" id="map-feedback"><p id="map-status" role="status" aria-live="polite" aria-atomic="true" tabindex="-1"></p><button id="map-retry" type="button" hidden data-i18n="retryImage">Retry image</button><div class="map-controls"><button id="zoom-out" type="button" aria-label="Zoom out" data-i18n-aria="zoomOut">−</button><button id="zoom-in" type="button" aria-label="Zoom in" data-i18n-aria="zoomIn">+</button><button id="reset-map" type="button" aria-label="Reset map extent" data-i18n-aria="reset">1:1</button></div></div>
           <div class="scene-caption"><p><span class="mono">NASA GIBS</span> <span data-i18n="dailyNote">Daily composite · scroll to change the date</span></p><span class="mono" data-i18n="mapExtent">320 × 200 km projected extent</span></div>
+          <p class="map-ground-note" id="map-ground-note" data-i18n="mapGroundNote">Satellite: daily composite. Station readings: at the day's maximum ΔT.</p>
+          <p class="map-interaction-hint" data-i18n="stationHint">Select a station to locate it; select again to clear.</p>
           <div class="scene-progress" aria-hidden="true"><span id="scene-progress"></span></div>
         </div>
         <div class="day-scenes" id="day-scenes"><article class="day-scene"><p class="eyebrow">14—20 SEP 2026</p><h3 data-i18n="weekFallback">A week in the atmosphere.</h3><p data-i18n="weekIntro">Move through a week of real satellite images.</p></article></div>
