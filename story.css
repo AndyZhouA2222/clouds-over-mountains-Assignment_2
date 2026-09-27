@@ -81,3 +81,52 @@ dialog[data-closing=true]::backdrop{background:rgb(0 0 0 / 0)}
 .map-interaction-hint{margin-top:5px;font-size:10px;line-height:1.5;color:var(--ice)}
 @media(max-width:800px){.map-interaction-hint{font-size:9px}}
 @media(prefers-reduced-motion:reduce){.station-transect:after{transform:none}.station-pulse{display:none}.map-metric,.map-marker{transition:none!important}}
+
+/* Micro-motion. Springs are sampled from damped step responses (ζ/ω noted), so CSS and script share one physics.
+   snappy ζ.62 ω28 — selection indicators · soft ζ.82 ω18 — values settling · pop ζ.45 ω30 — dots landing · rise ζ.78 ω12 — headings. */
+:root{--spring-snappy:linear(0,0.074,0.243,0.446,0.642,0.807,0.931,1.014,1.061,1.081,1.082,1.071,1.055,1.038,1.023,1.011,1.002,0.997,0.994,0.993,0.993,0.995,0.996,0.997,1);--spring-snappy-ms:360ms;--spring-soft:linear(0,0.047,0.157,0.293,0.433,0.562,0.674,0.767,0.841,0.897,0.938,0.967,0.987,0.999,1.006,1.01,1.011,1.011,1.01,1.008,1.007,1.005,1.004,1.003,1);--spring-soft-ms:450ms;--spring-pop:linear(0,0.111,0.364,0.654,0.909,1.088,1.183,1.205,1.177,1.123,1.063,1.013,0.978,0.961,0.958,0.965,0.977,0.989,0.999,1.005,1.008,1.008,1.007,1.004,1);--spring-pop-ms:410ms;--ease-snap:cubic-bezier(.16,1,.3,1)}
+/* Press lands fast; release springs back. */
+button{transition:color .15s,background-color .15s,transform var(--spring-pop-ms) var(--spring-pop)}
+button:active:not(:disabled){transition-duration:.15s,.15s,80ms;transition-timing-function:ease-out}
+.wordmark path{stroke-dasharray:1;stroke-dashoffset:0}
+/* The language pill slides between choices instead of swapping. */
+.language-switch.has-pill{position:relative}
+.language-switch.has-pill:before{content:"";position:absolute;top:2px;bottom:2px;left:0;width:var(--pill-w,0);transform:translateX(var(--pill-x,0));background:var(--snow);border-radius:99px;transition:transform var(--spring-snappy-ms) var(--spring-snappy),width var(--spring-snappy-ms) var(--spring-snappy)}
+.language-switch.has-pill button{position:relative;z-index:1}
+.language-switch.has-pill [aria-pressed=true]{background:transparent}
+/* One selection block travels along the day strip. */
+.day-strip{position:relative}
+.day-indicator{position:absolute;top:0;bottom:0;left:0;width:calc(100% / 7);background:var(--ink);transform:translateX(calc(var(--day-index,0) * 100%));transition:transform var(--spring-snappy-ms) var(--spring-snappy);pointer-events:none}
+.day-strip:has(.day-indicator) .day-choice{position:relative;z-index:1}
+.day-strip:has(.day-indicator) .day-choice[aria-pressed=true]{background:transparent}
+.scene-progress span{transition:width 420ms var(--ease-snap)}
+/* Scroll story: the day being read is in full voice; the others step back. */
+.day-scene h3,.day-scene .day-reading{transition:opacity var(--motion-state) var(--ease-settle),transform var(--motion-state) var(--ease-settle)}
+.day-scenes:has(.is-current) .day-scene:not(.is-current) :is(h3,.day-reading){opacity:.5}
+/* Satellite pass: the previous day stays underneath while the next one is scanned in. */
+.map-world>img.map-ghost{position:absolute;inset:0;pointer-events:none}
+.map-world>#map-image{position:relative}
+.scan-line{position:absolute;inset:0;pointer-events:none;opacity:0;background:linear-gradient(90deg,transparent calc(100% - 64px),rgb(166 255 229 / .16) calc(100% - 2px),var(--ice) calc(100% - 1px))}
+.scan-line.is-reverse{background:linear-gradient(270deg,transparent calc(100% - 64px),rgb(166 255 229 / .16) calc(100% - 2px),var(--ice) calc(100% - 1px))}
+.map-marker{transition:box-shadow 150ms ease-out,scale var(--spring-pop-ms) var(--spring-pop)}
+.map-marker.is-linked{scale:1.3}
+.metric-dot{transition:scale var(--spring-pop-ms) var(--spring-pop)}
+.map-metric.is-linked .metric-dot{scale:1.6}
+/* Chart marks scale around their own centre. */
+.chart-peak,.chart-point,.chart-ping,.cth-point,.chart-band{transform-box:fill-box;transform-origin:center}
+.chart-ping{fill:none;stroke:var(--ink);stroke-width:1.2;opacity:0;pointer-events:none}
+/* Headings rise out of a line mask. */
+.line-mask{display:block;overflow:hidden;padding:0 .06em .14em;margin:0 -.06em -.14em}
+.line-mask>span{display:block}
+.hero-image{scale:var(--hero-zoom,1)}
+@media(prefers-reduced-motion:reduce){.hero-image{scale:none}.day-scenes .day-scene :is(h3,.day-reading){opacity:1}.map-marker.is-linked,.map-metric.is-linked .metric-dot{scale:none}.scan-line,.map-ghost{display:none}}
+
+/* Imagery: depth under the mouse, spring zoom, and scans that pass rather than swap. */
+.hero.has-parallax .hero-image{translate:calc(var(--parallax-x,0) * -14px) calc(var(--parallax-y,0) * -10px);scale:calc(var(--hero-zoom,1) * 1.03)}
+.hero.has-parallax h1{translate:calc(var(--parallax-x,0) * 6px) calc(var(--parallax-y,0) * 4px)}
+#map-world{transition:transform var(--spring-soft-ms) var(--spring-soft)}
+.scan-line.is-up{background:linear-gradient(0deg,transparent calc(100% - 48px),rgb(166 255 229 / .14) calc(100% - 2px),var(--ice) calc(100% - 1px))}
+.map-world canvas.cloud-ghost{pointer-events:none}
+.chart-grid{transform-box:fill-box;transform-origin:left center}
+.cth-cell{transform-box:fill-box;transform-origin:center bottom}
+@media(prefers-reduced-motion:reduce){.hero.has-parallax .hero-image,.hero.has-parallax h1{translate:none}.hero.has-parallax .hero-image{scale:none}.cloud-ghost{display:none}}

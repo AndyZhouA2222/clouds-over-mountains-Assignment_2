@@ -53,6 +53,7 @@ window.CLOUD_ATLAS_I18N = (() => {
     dayCount:'第 {n} 天 / 共 7 天', peakStory:'最大温差出现在 {time} UTC。拖动下一章节的时间滑块，可查看这一天的全部小时观测。',
     imageAlt:'{date} 楚格峰地区 NASA VIIRS 真彩色日合成卫星影像', selectedHour:'{date} / {time} UTC，温差 {value} °C',
     cloudValue:'{time} UTC，云高中位数 {value} km', unavailable:'暂无有效数据', dataError:'观测数据未能载入。请确认 data 文件夹与页面一同保留。',
+    cloudPending:'13 次云顶扫描 · 2026 年 9 月 22 日', cloudLoading:'正在载入云顶观测…', retryCloud:'重试云高数据',
     cloudError:'云顶高度数据未能载入。气温观测仍可使用。', month:'9月', chartDay:'日'
   };
   const en = {
@@ -69,6 +70,7 @@ window.CLOUD_ATLAS_I18N = (() => {
     dayCount:'DAY {n} OF 7', peakStory:'The largest temperature difference arrives at {time} UTC. Explore every hourly reading in the next chapter.',
     imageAlt:'NASA VIIRS daily composite of the Zugspitze region, {date}', selectedHour:'{date} / {time} UTC, temperature difference {value} °C',
     cloudValue:'{time} UTC, median cloud height {value} km', unavailable:'No valid data', dataError:'Observation data could not be loaded. Keep the data folder alongside this page.',
+    cloudPending:'13 cloud scans · 22 SEP 2026', cloudLoading:'Loading cloud observations…', retryCloud:'Retry cloud data',
     cloudError:'Cloud-height data could not be loaded. Temperature observations are still available.', month:'SEP', chartDay:''
   };
   let language = 'en';

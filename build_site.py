@@ -14,7 +14,7 @@ import shutil
 
 ROOT = Path(__file__).resolve().parent
 SITE = ROOT / "site"
-PAGE_FILES = ("index.html", "app.js", "i18n.js", "motion.js", "story.css")
+PAGE_FILES = ("index.html", "app.js", "i18n.js", "viewport.js", "motion.js", "story.css")
 DATA_FILES = (
     "observations.js", "observations.json", "clouds.js", "clouds.json",
 )

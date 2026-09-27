@@ -3,7 +3,8 @@
   const $ = id => document.getElementById(id);
   const i18n = window.CLOUD_ATLAS_I18N;
   const data = window.CLOUD_ATLAS_DATA;
-  const cth = window.CLOUD_ATLAS_CTH;
+  const viewport = window.CLOUD_ATLAS_VIEWPORT;
+  let cth = null;
   const effects = window.CLOUD_ATLAS_MOTION;
   const clamp = (n,low,high) => Math.max(low,Math.min(high,n));
   const valid = value => Number.isFinite(value);
@@ -12,11 +13,23 @@
   const t = (key,values) => i18n.t(key,values);
   const state = {day:0,displayedDay:0,mapStatus:'loading',terrainStatus:'loading',hour:12,cloud:0,zoom:1,playing:false};
   let timer = null;
-  let scrollPending = false;
   let imageRequest = 0;
   let terrainRequest = 0;
   let sceneElements = [];
   let chartGeometry = null;
+  let temperatureGeometry = null;
+  let temperatureSize = {width:900,height:250};
+  let cloudSize = {width:650,height:240};
+  let temperatureFrame = 0;
+  let cloudFrame = 0;
+  let drawnCloud = -1;
+  let hasClouds = false;
+  let stats = [];
+  let maxShare = .001;
+  let cloudGrid = [];
+  let cloudStatus = 'idle';
+  let cloudScript = null;
+  let currentChapter = null;
   i18n.init();
   // A first visit starts in English; returning visitors retain their choice.
   let savedLanguage = 'en';
@@ -59,21 +72,104 @@
   const project = (lon,lat) => ({x:(mercX(lon)-bbox[0])/(bbox[2]-bbox[0])*mapWidth,y:(bbox[3]-mercY(lat))/(bbox[3]-bbox[1])*mapHeight});
   const colors = ['72,128,173','51,184,181','125,216,154','239,198,91','243,132,94'];
   const colorFor = height => colors[height < 1500 ? 0 : height < 2500 ? 1 : height < 3500 ? 2 : height < 4500 ? 3 : 4];
-  const hasClouds = Boolean(cth?.frames?.length && cth.latitudes?.length && cth.longitudes?.length);
-  const stats = hasClouds ? cth.frames.map(frame => {
-    const heights = frame.values.flatMap((row,r) => row.filter((height,c) => valid(height) && height > 0 && frame.opacity[r][c] > 0)).sort((a,b) => a-b);
-    const quantile = p => heights.length ? heights[Math.floor((heights.length-1)*p)] : null;
-    const bins = Array(10).fill(0);
-    heights.forEach(height => bins[clamp(Math.floor(height/500),0,9)]++);
-    return {count:heights.length,median:quantile(.5),p10:quantile(.1),p90:quantile(.9),bins};
-  }) : [];
-  const maxShare = Math.max(.001,...stats.flatMap(stat => stat.bins.map(count => count / Math.max(1,stat.count))));
   const currentFrame = () => data.days[state.day].frames[state.hour];
+  const temperatureValues = allFrames.map(frame => frame.delta).filter(valid);
+  const temperatureDomain = temperatureValues.length ? {
+    min:Math.floor((Math.min(...temperatureValues)-1)/5)*5,
+    max:Math.ceil((Math.max(...temperatureValues)+1)/5)*5
+  } : null;
+  const masthead = document.querySelector('.masthead');
+  const chapterSections = ['week','temperature','clouds'].map(id => ({id,element:$(id)}));
+  const chapterLinks = [...document.querySelectorAll('.chapters a, .mobile-chapters a')];
+  const weekStory = document.querySelector('.week-story');
+  const stickyScene = document.querySelector('.sticky-scene');
+
+  function renderCloudStatus() {
+    const status = $('cloud-status');
+    const retry = $('cloud-retry');
+    const key = cloudStatus === 'loading' ? 'cloudLoading' : cloudStatus === 'error' ? 'cloudError' : 'cloudPending';
+    status.textContent = t(key);
+    $('cloud-feedback').dataset.state = cloudStatus;
+    $('cloud-composition').setAttribute('aria-busy',String(cloudStatus === 'loading'));
+    if (cloudStatus === 'ready' && document.activeElement === retry) status.focus({preventScroll:true});
+    retry.hidden = cloudStatus !== 'error' && !(cloudStatus === 'loading' && !retry.hidden);
+    retry.setAttribute('aria-disabled',String(cloudStatus === 'loading'));
+    retry.textContent = t(cloudStatus === 'loading' ? 'retrying' : 'retryCloud');
+    $('cth-slider').disabled = !hasClouds;
+    $('cth-chart').setAttribute('aria-disabled',String(!hasClouds));
+    $('cth-chart').setAttribute('tabindex',hasClouds ? '0' : '-1');
+  }
+  function prepareCloudData(value) {
+    if (!value?.frames?.length || !value.latitudes?.length || !value.longitudes?.length) throw new Error('Missing cloud grid');
+    const rows = value.latitudes.length;
+    const columns = value.longitudes.length;
+    if (!value.frames.every(frame => typeof frame.utc === 'string' && frame.values?.length === rows && frame.opacity?.length === rows
+      && frame.values.every(row => row.length === columns) && frame.opacity.every(row => row.length === columns))) throw new Error('Incomplete cloud grid');
+    cth = value;
+    stats = cth.frames.map(frame => {
+      const heights = frame.values.flatMap((row,r) => row.filter((height,c) => valid(height) && height > 0 && frame.opacity[r][c] > 0)).sort((a,b) => a-b);
+      const quantile = p => heights.length ? heights[Math.floor((heights.length-1)*p)] : null;
+      const bins = Array(10).fill(0);
+      heights.forEach(height => bins[clamp(Math.floor(height/500),0,9)]++);
+      return {count:heights.length,median:quantile(.5),p10:quantile(.1),p90:quantile(.9),bins};
+    });
+    maxShare = Math.max(.001,...stats.flatMap(stat => stat.bins.map(count => count/Math.max(1,stat.count))));
+    const step = cth.gridDegrees || .03;
+    const columnsProjected = cth.longitudes.map(lon => {
+      const left = mercX(lon-step/2);
+      return {x:(left-bbox[0])/(bbox[2]-bbox[0])*mapWidth,width:(mercX(lon+step/2)-left)/(bbox[2]-bbox[0])*mapWidth};
+    });
+    cloudGrid = cth.latitudes.map(lat => {
+      const top = mercY(lat+step/2);
+      const y = (bbox[3]-top)/(bbox[3]-bbox[1])*mapHeight;
+      const height = (top-mercY(lat-step/2))/(bbox[3]-bbox[1])*mapHeight;
+      return columnsProjected.map(column => ({...column,y,height}));
+    });
+    state.cloud = clamp(state.cloud,0,stats.length-1);
+    drawnCloud = -1;
+    chartGeometry = null;
+    hasClouds = true;
+  }
+  function loadCloudData() {
+    if (cloudStatus === 'loading' || cloudStatus === 'ready') return;
+    const cached = cloudStatus === 'idle' ? window.CLOUD_ATLAS_CTH : null;
+    cloudStatus = 'loading';
+    renderCloudStatus();
+    const failed = () => {
+      cloudScript?.remove();
+      cloudScript = null;
+      hasClouds = false;
+      cloudStatus = 'error';
+      renderCloudStatus();
+      viewport.request({resize:true});
+    };
+    const loaded = () => {
+      try { prepareCloudData(window.CLOUD_ATLAS_CTH); }
+      catch (_) { failed(); return; }
+      cloudScript?.remove();
+      cloudScript = null;
+      cloudStatus = 'ready';
+      renderCloudStatus();
+      renderCloudReadings();
+      renderCloudChart();
+      drawClouds();
+      viewport.request({resize:true});
+      effects?.cloudsReady();
+    };
+    if (cached) { loaded(); return; }
+    // A classic script keeps the downloaded site usable directly from file://.
+    cloudScript = document.createElement('script');
+    cloudScript.src = 'data/clouds.js';
+    cloudScript.async = true;
+    cloudScript.onload = loaded;
+    cloudScript.onerror = failed;
+    document.head.append(cloudScript);
+  }
 
   function createScenes() {
     $('day-scenes').innerHTML = data.days.map((day,index) => '<article class="day-scene" data-scene="' + index + '"><p class="eyebrow scene-label"></p><h3>' + day.date.slice(8,10) + '<span class="scene-month"></span></h3><p class="day-reading">' + number(peaks[index]?.delta) + '°<small></small></p><p class="scene-story"></p></article>').join('');
     sceneElements = [...document.querySelectorAll('[data-scene]')];
-    $('day-strip').innerHTML = data.days.map((day,index) => '<button type="button" class="day-choice" data-day="' + index + '" aria-pressed="false"><span></span><strong>' + day.date.slice(8,10) + '</strong></button>').join('');
+    $('day-strip').innerHTML = '<span class="day-indicator" aria-hidden="true"></span>' + data.days.map((day,index) => '<button type="button" class="day-choice" data-day="' + index + '" aria-pressed="false"><span></span><strong>' + day.date.slice(8,10) + '</strong></button>').join('');
     document.querySelectorAll('[data-day]').forEach(button => button.addEventListener('click', () => {
       stopPlayback();
       selectDay(Number(button.dataset.day));
@@ -123,6 +219,7 @@
     $('scene-progress').style.width = ((state.displayedDay+1)/data.days.length*100) + '%';
     sceneElements.forEach((scene,index) => scene.classList.toggle('is-current',index === state.day));
     document.querySelectorAll('[data-day]').forEach(button => button.setAttribute('aria-pressed',String(Number(button.dataset.day) === state.day)));
+    $('day-strip').style.setProperty('--day-index',state.day);
     renderMapReadings();
     renderMapStatus();
   }
@@ -137,6 +234,7 @@
     retry.hidden = status !== 'error' && !(status === 'loading' && !retry.hidden);
     retry.setAttribute('aria-disabled',String(status === 'loading'));
     retry.textContent = t(status === 'loading' ? 'retrying' : prefix === 'map' ? 'retryImage' : 'retryTerrain');
+    viewport.request();
   }
   function renderMapStatus() {
     const key = state.mapStatus === 'loading' ? 'imageLoading' : state.mapStatus === 'error' ? 'imageLoadError' : 'imageReady';
@@ -163,12 +261,13 @@
         return;
       }
       if (request !== imageRequest) return;
-      const changed = $('map-image').getAttribute('src') !== source;
+      const previousSource = $('map-image').getAttribute('src');
+      const previousDay = state.displayedDay;
       $('map-image').src = source;
       state.displayedDay = day;
       state.mapStatus = 'ready';
       updateMapText();
-      if (changed) effects?.sceneChanged();
+      if (previousSource !== source) effects?.sceneChanged(previousSource,Math.sign(day-previousDay));
     };
     pending.onerror = () => {
       if (request !== imageRequest) return;
@@ -236,33 +335,63 @@
   }
   function renderTemperatureChart() {
     const svg = $('analysis-chart');
-    const width = Math.max(280,svg.clientWidth || 900);
-    const height = svg.clientHeight || 250;
+    const {width,height} = temperatureSize;
+    if (temperatureGeometry?.width === width && temperatureGeometry.height === height && temperatureGeometry.language === i18n.language) {
+      updateTemperatureSelection();
+      return;
+    }
     const pad = {l:32,r:12,t:32,b:32};
-    const values = allFrames.map(frame => frame.delta).filter(valid);
-    if (!values.length) { svg.innerHTML = ''; return; }
-    const min = Math.floor((Math.min(...values)-1)/5)*5;
-    const max = Math.ceil((Math.max(...values)+1)/5)*5;
+    if (!temperatureDomain) { svg.innerHTML = ''; temperatureGeometry = null; return; }
+    const {min,max} = temperatureDomain;
     const plotWidth = width-pad.l-pad.r;
     const plotHeight = height-pad.t-pad.b;
     // Every mark, including each daily maximum, shares the same hourly axis.
     const x = index => pad.l + (index+.5)/allFrames.length*plotWidth;
     const y = value => pad.t + (max-value)/(max-min)*plotHeight;
-    const start = offsets[state.day];
-    const selectedX = x(start+state.hour);
-    let markup = '<rect class="chart-band" x="' + (pad.l+start/allFrames.length*plotWidth) + '" y="' + pad.t + '" width="' + (data.days[state.day].frames.length/allFrames.length*plotWidth) + '" height="' + plotHeight + '"/>';
+    let markup = '<rect class="chart-band" y="' + pad.t + '" height="' + plotHeight + '"/>';
     markup += '<text class="chart-axis chart-unit" x="' + pad.l + '" y="14">ΔT (°C)</text>';
     for (let tick=min;tick<=max;tick+=5) markup += '<line class="chart-grid" x1="' + pad.l + '" x2="' + (width-pad.r) + '" y1="' + y(tick) + '" y2="' + y(tick) + '"/><text class="chart-axis" x="' + (pad.l-9) + '" y="' + (y(tick)+3) + '" text-anchor="end">' + tick + '</text>';
-    markup += '<path class="chart-line" d="' + pathFor(allFrames,x,y) + '"/><path class="chart-selected" d="' + pathFor(data.days[state.day].frames,x,y,start) + '"/>';
+    markup += '<path class="chart-line" d="' + pathFor(allFrames,x,y) + '"/><path class="chart-selected"/>';
     data.days.forEach((day,index) => {
       const peak = peaks[index];
       if (peak) markup += '<circle class="chart-peak" cx="' + x(offsets[index]+day.frames.indexOf(peak)) + '" cy="' + y(peak.delta) + '" r="2.6"/>';
       markup += '<text class="chart-axis" x="' + x(offsets[index]+(day.frames.length-1)/2) + '" y="' + (height-9) + '" text-anchor="middle">' + day.date.slice(8,10) + (width > 600 ? ' ' + t('month') : t('chartDay')) + '</text>';
     });
-    markup += '<line class="chart-cursor" x1="' + selectedX + '" x2="' + selectedX + '" y1="' + pad.t + '" y2="' + (height-pad.b) + '"/>';
-    if (valid(currentFrame()?.delta)) markup += '<circle class="chart-point" cx="' + selectedX + '" cy="' + y(currentFrame().delta) + '" r="4.5"/>';
+    markup += '<line class="chart-cursor" y1="' + pad.t + '" y2="' + (height-pad.b) + '"/><circle class="chart-point" r="4.5"/>';
     svg.setAttribute('viewBox','0 0 ' + width + ' ' + height);
     svg.innerHTML = markup;
+    temperatureGeometry = {width,height,language:i18n.language,x,y,left:pad.l,plotWidth,day:-1,hour:-1,
+      band:svg.querySelector('.chart-band'),selected:svg.querySelector('.chart-selected'),
+      cursor:svg.querySelector('.chart-cursor'),point:svg.querySelector('.chart-point')};
+    updateTemperatureSelection();
+  }
+  function updateTemperatureSelection() {
+    const geometry = temperatureGeometry;
+    if (!geometry || (geometry.day === state.day && geometry.hour === state.hour)) return;
+    const start = offsets[state.day];
+    if (geometry.day !== state.day) {
+      geometry.band.setAttribute('x',geometry.left+start/allFrames.length*geometry.plotWidth);
+      geometry.band.setAttribute('width',data.days[state.day].frames.length/allFrames.length*geometry.plotWidth);
+      geometry.selected.setAttribute('d',pathFor(data.days[state.day].frames,geometry.x,geometry.y,start));
+    }
+    const x = geometry.x(start+state.hour);
+    geometry.cursor.setAttribute('x1',x);
+    geometry.cursor.setAttribute('x2',x);
+    const delta = currentFrame()?.delta;
+    geometry.point.setAttribute('visibility',valid(delta) ? 'visible' : 'hidden');
+    if (valid(delta)) {
+      geometry.point.setAttribute('cx',x);
+      geometry.point.setAttribute('cy',geometry.y(delta));
+    }
+    geometry.day = state.day;
+    geometry.hour = state.hour;
+  }
+  function requestTemperatureSelection() {
+    if (temperatureFrame) return;
+    temperatureFrame = requestAnimationFrame(() => {
+      temperatureFrame = 0;
+      updateTemperatureSelection();
+    });
   }
   function selectDay(index) {
     const next = clamp(index,0,data.days.length-1);
@@ -273,6 +402,7 @@
     state.day = next;
     state.hour = clamp(state.hour,0,data.days[next].frames.length-1);
     loadMap(); updateMapText(); renderReadings(); renderTemperatureChart();
+    effects?.dayChanged();
   }
   function setZoom(next) {
     state.zoom = clamp(next,1,2.25);
@@ -298,23 +428,29 @@
     timer = setInterval(() => {
       state.hour = (state.hour+1)%data.days[state.day].frames.length;
       renderReadings(); renderTemperatureChart();
+      effects?.playTick();
     },850);
   }
   function drawClouds() {
     const ctx = $('cloud-canvas').getContext('2d');
-    if (!ctx || !hasClouds) return;
+    if (!ctx || !hasClouds || drawnCloud === state.cloud) return;
     ctx.clearRect(0,0,mapWidth,mapHeight);
     const frame = cth.frames[state.cloud];
-    const step = cth.gridDegrees || .03;
-    cth.latitudes.forEach((lat,row) => cth.longitudes.forEach((lon,col) => {
+    cloudGrid.forEach((cells,row) => cells.forEach((cell,col) => {
       const height = frame.values[row][col];
       const opacity = frame.opacity[row][col];
       if (!valid(height) || height <= 0 || !valid(opacity) || opacity <= 0) return;
-      const nw = project(lon-step/2,lat+step/2);
-      const se = project(lon+step/2,lat-step/2);
       ctx.fillStyle = 'rgba(' + colorFor(height) + ',' + (.22+.42*clamp(opacity,0,100)/100) + ')';
-      ctx.fillRect(nw.x,nw.y,se.x-nw.x,se.y-nw.y);
+      ctx.fillRect(cell.x,cell.y,cell.width,cell.height);
     }));
+    drawnCloud = state.cloud;
+  }
+  function requestCloudDraw() {
+    if (cloudFrame) return;
+    cloudFrame = requestAnimationFrame(() => {
+      cloudFrame = 0;
+      drawClouds();
+    });
   }
   function renderCloudReadings() {
     if (!hasClouds) return;
@@ -340,8 +476,12 @@
   function renderCloudChart() {
     if (!hasClouds) return;
     const svg = $('cth-chart');
-    const width = Math.max(280,svg.clientWidth || 650);
-    const height = svg.clientHeight || 240;
+    const {width,height} = cloudSize;
+    if (chartGeometry?.width === width && chartGeometry.height === height) {
+      updateCloudSelection();
+      return;
+    }
+    effects?.resetCloudMotion();
     const pad = {l:38,r:8,t:8,b:28};
     const cellWidth = (width-pad.l-pad.r)/stats.length;
     const cellHeight = (height-pad.t-pad.b)/10;
@@ -351,7 +491,7 @@
     stats.forEach((item,index) => item.bins.forEach((count,bin) => {
       const share = count/Math.max(1,item.count);
       const alpha = count ? .1+.85*Math.sqrt(share/maxShare) : .025;
-      markup += '<rect x="' + (pad.l+index*cellWidth+1) + '" y="' + (pad.t+(9-bin)*cellHeight+.5) + '" width="' + (cellWidth-2) + '" height="' + (cellHeight-1) + '" fill="rgb(' + colorFor(bin*500+250) + ')" fill-opacity="' + alpha + '"/>';
+      markup += '<rect class="cth-cell" data-col="' + index + '" x="' + (pad.l+index*cellWidth+1) + '" y="' + (pad.t+(9-bin)*cellHeight+.5) + '" width="' + (cellWidth-2) + '" height="' + (cellHeight-1) + '" fill="rgb(' + colorFor(bin*500+250) + ')" fill-opacity="' + alpha + '"/>';
     }));
     [0,2,4,6,8,9].forEach(bin => {
       markup += '<text class="chart-axis" x="' + (pad.l-8) + '" y="' + (y(bin)+3) + '" text-anchor="end">' + (bin === 9 ? '4.5+' : (bin/2).toFixed(1)) + '</text>';
@@ -363,57 +503,99 @@
       connected = true;
       return command;
     }).join(' ');
-    markup += '<path class="cth-line" d="' + line + '"/><rect class="cth-cursor" x="' + (pad.l+state.cloud*cellWidth+.5) + '" y="' + pad.t + '" width="' + (cellWidth-1) + '" height="' + (cellHeight*10) + '"/>';
-    if (valid(stats[state.cloud].median)) markup += '<circle class="cth-point" cx="' + x(state.cloud) + '" cy="' + y(clamp(Math.floor(stats[state.cloud].median/500),0,9)) + '" r="4"/>';
+    markup += '<path class="cth-line" d="' + line + '"/><rect class="cth-cursor" y="' + pad.t + '" width="' + (cellWidth-1) + '" height="' + (cellHeight*10) + '"/><circle class="cth-point" r="4"/>';
     stats.forEach((_,index) => {
       if (index%3 === 0 || index === stats.length-1) markup += '<text class="chart-axis" x="' + x(index) + '" y="' + (height-7) + '" text-anchor="middle">' + cth.frames[index].utc.slice(11,13) + '</text>';
     });
     svg.setAttribute('viewBox','0 0 ' + width + ' ' + height);
     svg.innerHTML = markup;
-    chartGeometry = {width,left:pad.l,cellWidth};
+    chartGeometry = {width,height,left:pad.l,cellWidth,x,y,cloud:-1,
+      cursor:svg.querySelector('.cth-cursor'),point:svg.querySelector('.cth-point')};
+    updateCloudSelection();
   }
-  function selectCloud(index) {
-    if (!hasClouds) return;
-    state.cloud = clamp(index,0,stats.length-1);
-    drawClouds(); renderCloudReadings(); renderCloudChart();
+  function updateCloudSelection() {
+    const geometry = chartGeometry;
+    if (!geometry || geometry.cloud === state.cloud) return;
+    geometry.cursor.setAttribute('x',geometry.left+state.cloud*geometry.cellWidth+.5);
+    const median = stats[state.cloud].median;
+    geometry.point.setAttribute('visibility',valid(median) ? 'visible' : 'hidden');
+    if (valid(median)) {
+      geometry.point.setAttribute('cx',geometry.x(state.cloud));
+      geometry.point.setAttribute('cy',geometry.y(clamp(Math.floor(median/500),0,9)));
+    }
+    geometry.cloud = state.cloud;
+  }
+  function selectCloud(index,stepped = false) {
+    if (!hasClouds) return false;
+    const next = clamp(index,0,stats.length-1);
+    if (next === state.cloud) return false;
+    effects?.resetCloudMotion();
+    // Discrete steps (a column, a key) pass between scans; slider dragging stays immediate.
+    if (stepped) effects?.cloudFrameWillChange(Math.sign(next-state.cloud));
+    state.cloud = next;
+    renderCloudReadings(); updateCloudSelection(); requestCloudDraw();
+    return true;
   }
   function renderLanguage() {
     translateScenes(); updateMapText(); renderTerrainStatus(); renderReadings(); renderWeeklyFinding(); updatePlayButton(); renderTemperatureChart(); renderCloudReadings(); renderCloudChart();
-    if (!hasClouds) showError('cloudError');
+    renderCloudStatus();
+    viewport.request({resize:true});
   }
-  function updateChapterNavigation() {
-    const threshold = document.querySelector('.masthead').getBoundingClientRect().bottom + 32;
+  function measurePage(frame) {
+    const threshold = frame.rect(masthead).bottom + 32;
     let current = '';
-    for (const id of ['week','temperature','clouds']) {
-      const rect = $(id).getBoundingClientRect();
+    let loadClouds = false;
+    chapterSections.forEach(({id,element}) => {
+      const rect = frame.rect(element);
       if (rect.top <= threshold && rect.bottom > threshold) current = '#' + id;
-    }
-    document.querySelectorAll('.chapters a, .mobile-chapters a').forEach(link => {
-      if (link.getAttribute('href') === current) link.setAttribute('aria-current','location');
-      else link.removeAttribute('aria-current');
+      if (id === 'clouds') loadClouds = cloudStatus === 'idle' && rect.top < frame.height+800 && rect.bottom > 0;
     });
-  }
-  function syncScroll() {
-    scrollPending = false;
-    updateChapterNavigation();
-    const storyRect = document.querySelector('.week-story').getBoundingClientRect();
-    const mobile = window.innerWidth <= 800;
-    const sticky = document.querySelector('.sticky-scene');
-    // Read the scene beneath the sticky map, including the mobile chapter header.
-    const readingTop = clamp(sticky.getBoundingClientRect().bottom,0,innerHeight);
-    const target = mobile ? Math.min(innerHeight-24,readingTop+(innerHeight-readingTop)*.45) : innerHeight*.5;
-    if (storyRect.top < target && storyRect.bottom > target) {
-      let nearest = 0;
-      let distance = Infinity;
-      sceneElements.forEach((scene,index) => {
-        const rect = scene.getBoundingClientRect();
-        const delta = Math.abs(rect.top+rect.height/2-target);
-        if (delta < distance) { distance = delta; nearest = index; }
-      });
-      if (nearest !== state.day) { stopPlayback(); selectDay(nearest); }
+    const storyRect = frame.rect(weekStory);
+    let nearest = null;
+    if (storyRect.top < frame.height && storyRect.bottom > 0) {
+      const readingTop = clamp(frame.rect(stickyScene).bottom,0,frame.height);
+      const target = frame.width <= 800 ? Math.min(frame.height-24,readingTop+(frame.height-readingTop)*.45) : frame.height*.5;
+      if (storyRect.top < target && storyRect.bottom > target) {
+        let distance = Infinity;
+        sceneElements.forEach((scene,index) => {
+          const rect = frame.rect(scene);
+          const delta = Math.abs(rect.top+rect.height/2-target);
+          if (delta < distance) { distance = delta; nearest = index; }
+        });
+      }
     }
+    let sizes = null;
+    if (frame.resized) {
+      const temperature = frame.rect($('analysis-chart'));
+      const cloud = frame.rect($('cth-chart'));
+      sizes = {temperature:{width:Math.max(280,temperature.width || 900),height:temperature.height || 250},
+        cloud:{width:Math.max(280,cloud.width || 650),height:cloud.height || 240}};
+    }
+    return {current,nearest,loadClouds,sizes};
   }
-  $('time-slider').addEventListener('input',event => { stopPlayback(); state.hour = Number(event.target.value); renderReadings(); renderTemperatureChart(); });
+  function updatePage(value) {
+    if (currentChapter !== value.current) {
+      currentChapter = value.current;
+      chapterLinks.forEach(link => {
+        if (link.getAttribute('href') === value.current) link.setAttribute('aria-current','location');
+        else link.removeAttribute('aria-current');
+      });
+    }
+    if (value.sizes) {
+      temperatureSize = value.sizes.temperature;
+      cloudSize = value.sizes.cloud;
+      renderTemperatureChart(); renderCloudChart();
+    }
+    if (value.nearest !== null && value.nearest !== state.day) { stopPlayback(); selectDay(value.nearest); }
+    if (value.loadClouds) loadCloudData();
+  }
+  $('time-slider').addEventListener('input',event => {
+    stopPlayback();
+    const hour = Number(event.target.value);
+    if (hour === state.hour) return;
+    state.hour = hour;
+    renderReadings(); requestTemperatureSelection();
+  });
   $('time-slider').addEventListener('change',() => effects?.readingChanged());
   $('play-button').addEventListener('click',togglePlayback);
   $('zoom-in').addEventListener('click',() => setZoom(state.zoom+.25));
@@ -427,8 +609,7 @@
     const previousX = Number($('cth-chart').querySelector('.cth-cursor')?.getAttribute('x'));
     const rect = $('cth-chart').getBoundingClientRect();
     const px = (event.clientX-rect.left)/rect.width*chartGeometry.width;
-    selectCloud(Math.floor((px-chartGeometry.left)/chartGeometry.cellWidth));
-    effects?.cloudChanged(previousX);
+    if (selectCloud(Math.floor((px-chartGeometry.left)/chartGeometry.cellWidth),true)) effects?.cloudChanged(previousX);
   });
   $('cth-chart').addEventListener('keydown',event => {
     const moves = {ArrowLeft:-1,ArrowDown:-1,ArrowRight:1,ArrowUp:1,PageDown:-3,PageUp:3};
@@ -437,10 +618,11 @@
     else if (event.key === 'Home') next = 0;
     else if (event.key === 'End') next = stats.length-1;
     else return;
-    event.preventDefault(); selectCloud(next);
+    event.preventDefault(); selectCloud(next,true);
   });
   $('map-retry').addEventListener('click',() => { if (state.mapStatus === 'error') loadMap(); });
   $('terrain-retry').addEventListener('click',loadTerrain);
+  $('cloud-retry').addEventListener('click',loadCloudData);
   $('map-image').addEventListener('error',() => {
     if (state.mapStatus !== 'ready') return;
     state.mapStatus = 'error';
@@ -457,20 +639,7 @@
   if ($('cth-image').complete) state.terrainStatus = $('cth-image').naturalWidth ? 'ready' : 'error';
   document.addEventListener('visibilitychange',() => { if (document.hidden) stopPlayback(); });
   window.addEventListener('pagehide',stopPlayback);
-  window.addEventListener('scroll',() => { if (!scrollPending) { scrollPending = true; requestAnimationFrame(syncScroll); } },{passive:true});
-  let resizePending = false;
-  window.addEventListener('resize',() => {
-    if (resizePending) return;
-    resizePending = true;
-    requestAnimationFrame(() => { resizePending = false; renderTemperatureChart(); renderCloudChart(); syncScroll(); });
-  },{passive:true});
   createScenes(); renderMarkers(); setZoom(1); renderLanguage(); loadMap();
-  if (hasClouds) drawClouds();
-  else {
-    $('cth-slider').disabled = true;
-    $('cth-chart').setAttribute('aria-disabled','true');
-    $('cth-chart').removeAttribute('tabindex');
-  }
-  requestAnimationFrame(syncScroll);
+  viewport.subscribe({measure:measurePage,update:updatePage});
   effects?.init();
 })();
