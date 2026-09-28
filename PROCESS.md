@@ -2,6 +2,16 @@
 
 *Written on 28 September 2026 from my conversations with Codex and, in the final stage, Claude Code. Requests are summarised, not quoted.*
 
+## Early exploration with Codex
+
+I began with an interest in cumulonimbus clouds over mountains and chose the Zugspitze in Germany after discussing locations with Codex. My initial idea combined satellite imagery, valley-to-summit temperature differences and possible photography viewpoints. The scope narrowed to data exploration, focusing on 14–20 September.
+
+Codex prepared a handover document and built the prototype. I requested real observations, corrected image proportions and clearer data presentation. When the interface remained unsatisfactory, I asked it to rethink the purpose before redesigning. I also requested an assignment audit before authorising changes.
+
+Using the web-design-engineer skill, Codex developed the interface further. I requested an Active Theory-inspired direction and a closer connection between satellite imagery and cloud-height data.
+
+I kept the combination of imagery and measurements because it linked my visual interest to observable changes. I rejected stretched images and unclear layouts. I also kept the 22 September cloud-height data separate from the main study week. Neither temperature differences nor these images alone establish that the clouds are cumulonimbus.
+
 ## Tools
 
 - **Codex** redesigned and refined the interactive website, checked it against the assignment, and fixed the issues I prioritised.
